@@ -32,9 +32,10 @@ Writing rules:
 
 ## 3. Reference flow
 
-The model follows a **generic gate-last 28 nm foundry archetype**: HKMG with high-k last and metal gate last.
+The model is **anchored to Intel's 32 nm flow**: gate-last HKMG with high-k last, eSiGe PMOS, and raised NMOS source/drains. The site still describes itself as "28 nm-class."
 
-- Where Intel 32 nm differed, that difference goes in a `fab_reality` note.
+- Intel 32 nm is the best-documented flow of this generation (IEDM papers plus independent teardowns), and it is the flow Plummer & Griffin Ch. 2 describes.
+- Foundry 28 nm differences go in `fab_reality` notes. For example, TSMC 28 nm put the high-k down first, and its 28HPL variant had no eSiGe.
 - Gate-first 28 nm flows (the IBM alliance: GlobalFoundries and Samsung) are out of scope and get one mention.
 - Any claim about what a specific company did needs a second source.
 
@@ -70,9 +71,9 @@ This is an outline only. Parameters, sources, and exact step lists belong in `sp
 | `ldd` | Offset spacer deposition and etch · PMOS halo + extension implants · NMOS halo + extension implants · anneal (method to verify) |
 | `spacer` | Main spacer deposition · anisotropic spacer etch |
 | `sige` | Nitride hard mask · PMOS open · Σ recess · in-situ B-doped SiGe epi · hard mask strip |
-| `sd` | NMOS deep S/D mask · implant · strip · activation anneal (spike/millisecond) |
+| `sd` | NMOS raised S/D epi (material and order to verify) · NMOS deep S/D mask · implant · strip · activation anneal (spike/millisecond) |
 | `silicide` | Pre-clean · NiPt deposition · first anneal · selective strip · second anneal (anneal count to verify) |
-| `rmg` | Tensile CESL · ILD0 · CMP to poly-open · dummy poly removal · dummy oxide removal · interfacial oxide · HfO₂ · TiN cap · TaN etch stop · PMOS work-function TiN · NMOS open and TiN etch · Al work function + fill · CMP |
+| `rmg` | ILD0 · CMP to poly-open · dummy poly removal · dummy oxide removal · interfacial oxide · HfO₂ · TiN cap · TaN etch stop · PMOS work-function TiN · NMOS open and TiN etch · Al work function + fill · CMP |
 | `contact` | ILD · contact mask · etch · Ti/TiN liner · W CVD · CMP |
 | `beol` | M1: cap/etch stop, low-k, trench, barrier/seed, ECD, anneal, CMP · V1 + M2: dual damascene · passivation as a note only |
 | `finfet` | Epilogue (§10) |
@@ -93,16 +94,17 @@ Each becomes a `fab_reality` note on the affected steps, citing its own source.
 
 | # | Textbook | Modeled instead | Confidence |
 |---|---|---|---|
-| G1 | Vertically compressed simulation domain: STI ~40 nm, 3–10 keV well implants | Real-scale depths: STI on the order of 250–350 nm, retrograde wells below the STI | High that the textbook is compressed; values to source |
-| G2 | NMOS strain from SiC:P epi | Tensile nitride CESL after silicide; stress memorization (SMT) as a text note | Medium, verify |
+| G1 | Vertically compressed simulation domain: STI ~40 nm, 3–10 keV well implants | Real-scale depths: STI ≈ 200 nm (Intel 32 nm isolation thickness), retrograde wells below the STI | High that the textbook is compressed; STI single-source |
+| G2 | NMOS strain from SiC:P epi | Raised NMOS S/D epi; strain from stacking faults and the RMG flow as text notes (not geometry). No stress liner unless a source shows one | Raised S/D verified; strain mechanism single-source |
 | G3 | PMOS deep S/D implant, then recess + SiGe | Σ recess + in-situ B-doped SiGe right after the main spacer, before the NMOS deep S/D; no PMOS deep implant | Medium-high on order; medium on Σ shape, verify |
-| G4 | TiSi₂ at 350–450 °C with a TiN strip | NiPt silicide before ILD0; poly protected by the gate nitride hard mask; Intel-style trench silicide as a note | Medium-high, verify timing |
+| G4 | TiSi₂ at 350–450 °C with a TiN strip | NiPt-class silicide; poly protected by the gate nitride hard mask. Timing (before ILD0 vs. in contact trenches) follows Intel 32 nm once sourced | Uncertain, verify |
 | G5 | One 10 nm spacer; extensions implanted against the bare gate | Thin offset spacer before halo/extension implants, then the main spacer | High |
 | G6 | Well drive-in at 1000 °C for 10 min; separate well and Vt masks | One mask per well carrying deep-well, punch-through, and Vt implants, then a short anneal | High |
 
 ### 7.2 Text-only
 
-- Intel 45 nm was high-k first, metal gate last. Our high-k-last flow matches 32/28 nm.
+- Intel 45 nm was high-k first, metal gate last; Intel moved to high-k last at 32 nm. TSMC 28 nm stayed high-k first.
+- Embedded Si:C for NMOS reached production only at IBM 22 nm (2012), so the textbook's SiC:P NMOS step doesn't fit this generation.
 - STI gap fill was HDP-CVD, SACVD (O₃-TEOS), or flowable CVD, not LPCVD SiH₄ + O₂. This changes the tool class but not the modeled shape.
 - Si–O is the stronger bond, not Si–N (the textbook, p. 38, says the reverse).
 - "Si₂Cl₂" on p. 38 is a typo for SiH₂Cl₂.
@@ -184,10 +186,11 @@ Each item gets a source in `spec/sources.md`, or stays in the data with confiden
 - Dummy poly at cell edges as a 28 nm design rule.
 - Poly-cut mask at 28 nm gate patterning.
 - M1 single vs. dual damascene at 28 nm.
-- Foundry 28 nm NMOS strain: CESL and SMT (G2).
+- Intel 32 nm NMOS raised S/D: material, doping, and where it sits in the order (G2).
 - Σ-recess profile at 28 nm (G3).
-- Silicide timing, pre-ILD0 vs. trench silicide, and the number of anneals (G4).
-- High-k first vs. last at foundry 28 nm.
+- Intel 32 nm silicide and contact scheme: timing and number of anneals (G4).
+- A second, independent source for Intel 32 nm high-k last (currently Chipworks only).
+- Independent measurements of Intel 32 nm CPP, Lg, and STI depth (currently Intel only).
 - Anneal method after the halo/extension implants.
 - Real dimensions: Lg, CPP, cell height, STI depth, gate height, every film thickness.
 - Real-scale well, punch-through, and Vt implant species, energies, and doses.

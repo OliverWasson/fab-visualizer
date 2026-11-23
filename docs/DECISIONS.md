@@ -61,5 +61,11 @@ Newest entries go at the bottom. Each entry has a date, the decision, and why. D
 - **"Verified" is countable.** Each source in `sources.md` has a Group (same authors, same company, or derived works share one). A `verified` param needs sources from 2+ different groups, and the checker fails it otherwise. Why: "two independent sources" was an honor-system claim.
 - **Source types are ranked** (header of `sources.md`): papers and teardowns for what a node actually did, textbooks for physics and ordering, roadmaps only as labeled targets, patents never alone. Wikipedia, forums, and AI output are never sources.
 
+## 2026-11-23: Reference flow anchored to Intel 32 nm
+- **The model follows Intel 32 nm:** gate-last, high-k last, eSiGe PMOS, raised NMOS S/D. This *supersedes* "generic gate-last 28 nm foundry archetype" in the Scope entry. Why: the generic archetype matched no real flow. TSMC 28 nm was high-k first, and 28HPL had no eSiGe (James2014). Intel 32 nm is well documented (Natarajan2008, Packan2009, James2014) and is the flow the textbook describes.
+- **G1 value:** STI ≈ 200 nm (Natarajan2008 Table 1), replacing the unsourced "250–350 nm."
+- **G2 revised:** NMOS gets a raised S/D epi step; its strain (stacking faults, RMG) is a text note. The tensile CESL step is removed. *Supersedes* G2 in the Scope entry.
+- **G4 reopened:** silicide timing follows Intel 32 nm once sourced; `uncertain` until then.
+
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.
