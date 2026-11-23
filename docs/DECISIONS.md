@@ -58,6 +58,8 @@ Newest entries go at the bottom. Each entry has a date, the decision, and why. D
 - **A missing `.glb` for a geometry step is a warning until M1 is done,** then becomes an error.
 - **Licenses: MIT for code, CC BY 4.0 for content** (docs, spec text, masks, generated models and doping data). Why: anyone, including courses, can reuse the material with credit, which is the point of an educational project. Third-party components keep their own licenses, recorded in `ATTRIBUTIONS.md`.
 - **Reference PDFs are gitignored.** The Plummer & Griffin prepublication is for personal use only, so it must never be committed. Checked on 2026-11-23: no PDF has ever been in the repo's history.
+- **"Verified" is countable.** Each source in `sources.md` has a Group (same authors, same company, or derived works share one). A `verified` param needs sources from 2+ different groups, and the checker fails it otherwise. Why: "two independent sources" was an honor-system claim.
+- **Source types are ranked** (header of `sources.md`): papers and teardowns for what a node actually did, textbooks for physics and ordering, roadmaps only as labeled targets, patents never alone. Wikipedia, forums, and AI output are never sources.
 
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

@@ -104,12 +104,6 @@ def words(text: str) -> int:
     return len(TAG_RE.sub("", text).split())
 
 
-def load_source_keys(path: Path = SOURCES_PATH) -> set[str] | None:
-    if not path.exists():
-        return None
-    return set(SOURCE_HEADING_RE.findall(path.read_text(encoding="utf-8")))
-
-
 class _Report:
     def __init__(self) -> None:
         self.errors: list[str] = []
@@ -120,6 +114,51 @@ class _Report:
 
     def warn(self, where: str, msg: str) -> None:
         self.warnings.append(f"{where}: {msg}")
+
+
+SOURCE_TYPES = (
+    "paper",
+    "teardown",
+    "textbook",
+    "review",
+    "roadmap",
+    "vendor",
+    "patent",
+    "news",
+)
+SOURCE_FIELDS = ("Citation", "Type", "Group")
+FIELD_RE = re.compile(r"^\s*-\s*\*\*([A-Za-z]+):\*\*\s*(.*?)\s*$")
+
+
+def load_sources(
+    path: Path = SOURCES_PATH,
+) -> tuple[dict[str, dict[str, str]] | None, _Report]:
+    """Parse sources.md into {base_key: {field: value}} and report format problems."""
+    r = _Report()
+    if not path.exists():
+        return None, r
+    entries: dict[str, dict[str, str]] = {}
+    current: str | None = None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("### "):
+            m = SOURCE_HEADING_RE.match(line)
+            if not m:
+                r.err("spec/sources.md", f"heading {line!r} is not a valid base key")
+                current = None
+                continue
+            current = m.group(1)
+            if current in entries:
+                r.err(current, "duplicate source key")
+            entries[current] = {}
+        elif current and (f := FIELD_RE.match(line)):
+            entries[current][f.group(1)] = f.group(2)
+    for key, fields in entries.items():
+        for need in SOURCE_FIELDS:
+            if not fields.get(need):
+                r.err(key, f"missing **{need}:** line")
+        if fields.get("Type") and fields["Type"] not in SOURCE_TYPES:
+            r.err(key, f"type {fields['Type']!r} not in {SOURCE_TYPES}")
+    return entries, r
 
 
 def _check_text(r: _Report, where: str, field: str, text: Any) -> None:
@@ -137,17 +176,28 @@ def _check_text(r: _Report, where: str, field: str, text: Any) -> None:
         )
 
 
-def _check_source(r: _Report, where: str, source: Any, keys: set[str] | None) -> None:
-    m = SOURCE_RE.match(source) if isinstance(source, str) else None
-    if not m:
-        r.err(where, f"source {source!r} is not a valid key like PG2023-ch2-p41")
-    elif keys is None:
-        r.err(where, "spec/sources.md is missing, so sources can't be resolved")
-    elif m.group(1) not in keys:
-        r.err(
-            where,
-            f"source base key {m.group(1)!r} has no '### {m.group(1)}' in sources.md",
-        )
+def _resolve_sources(
+    r: _Report, where: str, source: Any, sources: dict[str, dict[str, str]] | None
+) -> list[str]:
+    """Check one source key or a list of them; return the groups that resolved."""
+    keys = source if isinstance(source, list) else [source]
+    if not keys:
+        r.err(where, "source list is empty")
+    groups: list[str] = []
+    for key in keys:
+        m = SOURCE_RE.match(key) if isinstance(key, str) else None
+        if not m:
+            r.err(where, f"source {key!r} is not a valid key like PG2023-ch2-p41")
+        elif sources is None:
+            r.err(where, "spec/sources.md is missing, so sources can't be resolved")
+        elif m.group(1) not in sources:
+            r.err(
+                where,
+                f"source base key {m.group(1)!r} has no '### {m.group(1)}' in sources.md",
+            )
+        else:
+            groups.append(sources[m.group(1)].get("Group", m.group(1)))
+    return groups
 
 
 def _check_camera(r: _Report, where: str, cam: Any) -> None:
@@ -168,7 +218,10 @@ def _check_camera(r: _Report, where: str, cam: Any) -> None:
 
 
 def _check_step(
-    r: _Report, s: dict[str, Any], ids_so_far: list[str], keys: set[str] | None
+    r: _Report,
+    s: dict[str, Any],
+    ids_so_far: list[str],
+    sources: dict[str, dict[str, str]] | None,
 ) -> None:
     where = str(s.get("id", f"step #{len(ids_so_far) + 1}"))
     for k in REQUIRED:
@@ -235,14 +288,18 @@ def _check_step(
             r.err(pw, "must be a mapping")
             continue
         for k in ("name", "value", "source", "confidence"):
-            if p.get(k) in (None, ""):
+            if p.get(k) in (None, "") or p.get(k) == []:
                 r.err(pw, f"missing {k!r}")
         if "unit" not in p:
             r.err(pw, "missing 'unit' (use null if dimensionless)")
         if p.get("confidence") and p["confidence"] not in CONFIDENCE:
             r.err(pw, f"confidence {p['confidence']!r} not in {CONFIDENCE}")
         if p.get("source"):
-            _check_source(r, pw, p["source"], keys)
+            groups = _resolve_sources(r, pw, p["source"], sources)
+            if p.get("confidence") == "verified" and len(set(groups)) < 2:
+                r.err(
+                    pw, "verified needs 2+ sources from different groups in sources.md"
+                )
         names.add(str(p.get("name")))
     for need in KIND_PARAMS.get(kind, ()):
         if need not in names:
@@ -255,7 +312,7 @@ def _check_step(
         elif not fr.get("source"):
             r.err(where, "fab_reality needs its own source")
         else:
-            _check_source(r, f"{where} fab_reality", fr["source"], keys)
+            _resolve_sources(r, f"{where} fab_reality", fr["source"], sources)
 
     for ref in ("model", "doping_state"):
         if s.get(ref) is not None and s[ref] not in ids_so_far:
@@ -267,8 +324,10 @@ def _check_step(
 
 
 def check_steps(path: Path = STEPS_PATH) -> tuple[list[str], list[str]]:
-    """Return (errors, warnings) for spec/steps.yaml."""
-    r = _Report()
+    """Return (errors, warnings) for spec/steps.yaml and spec/sources.md."""
+    sources, r = load_sources()
+    if sources is None:
+        r.warn("spec/sources.md", "not written yet")
     if not path.exists():
         r.warn("spec/steps.yaml", "not written yet")
         return r.errors, r.warnings
@@ -277,7 +336,6 @@ def check_steps(path: Path = STEPS_PATH) -> tuple[list[str], list[str]]:
         r.err("spec/steps.yaml", "top level must be a list of steps")
         return r.errors, r.warnings
 
-    keys = load_source_keys()
     ids: list[str] = []
     last_module, last_nn = -1, 0
     for s in data:
@@ -305,7 +363,7 @@ def check_steps(path: Path = STEPS_PATH) -> tuple[list[str], list[str]]:
                 last_module, last_nn = mi, nn
             if sid in ids:
                 r.err(sid, "duplicate id")
-        _check_step(r, s, ids, keys)
+        _check_step(r, s, ids, sources)
         if isinstance(sid, str):
             ids.append(sid)
     return r.errors, r.warnings

@@ -92,7 +92,7 @@ One color per material, used identically in every step and in both themes. Defin
     - name: precursors
       value: SiH<sub>2</sub>Cl<sub>2</sub> + NH<sub>3</sub>
       unit: null
-      source: PG2023-ch2-p38
+      source: PG2023-ch2-p38      # one key, or a list of keys
       confidence: single-source   # verified | single-source | uncertain
   fab_reality:              # optional
     note: ...
@@ -101,11 +101,13 @@ One color per material, used identically in every step and in both themes. Defin
 
 - `model` and `doping_state` default to the latest available. Set them explicitly only to override.
 - Implant steps include `species`, `energy`, `dose`, `tilt`, and `twist` params. Thermal steps include `temperature`, `time`, and `ambient`.
-- `confidence`: `verified` means two or more independent sources agree; `single-source` means one; `uncertain` means flagged and not yet confirmed.
+- `confidence`: `verified` means two or more independent sources agree, which the checker enforces as sources from at least two different **Group**s in `sources.md`; `single-source` means one; `uncertain` means flagged and not yet confirmed.
 
 ## Sources
 - Every parameter has a source key, for example `source: PG2023-ch2-p41-fig2.7`.
 - Full citations live in `spec/sources.md`, one per `### <BASEKEY>` heading (for example `### PG2023`). A source key is the base key plus an optional locator after the first hyphen, so `PG2023-ch2-p41-fig2.7` resolves to `PG2023`.
+- Each `sources.md` entry has **Citation**, **Type**, and **Group** lines; the file's header lists the allowed types and what makes sources independent.
+- AI output, including Claude's, is never a source. A value enters `steps.yaml` only when it traces to a document someone actually read.
 - Reference PDFs are **never committed** (`*.pdf` and `references/` are gitignored). Keep local copies in `references/`.
 - Plummer & Griffin text and figures are **never copied**. Facts and parameters are paraphrased and cited; all geometry and images are our own.
 - Where the textbook differs from real fab practice, the step gets a `fab_reality` note with its own source.
