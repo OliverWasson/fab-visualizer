@@ -1,6 +1,6 @@
 # Style
 
-How the site looks, moves, and reads. Approved 2026-11-23. Any change goes through `DECISIONS.md` first. Hex values are mirrored in `pipeline/materials.py` and `web/src/materials.ts`.
+How the site looks, moves, and reads. Approved 2026-11-23. Any change goes through `DECISIONS.md` first. Hex values live in `spec/materials.yaml`, the single source that both the pipeline and the web app read.
 
 ## 1. Principles
 

@@ -51,5 +51,9 @@ Newest entries go at the bottom. Each entry has a date, the decision, and why. D
 - **Light scene background is the cool neutral `#E9ECEF`**, not the warm cream used in the swatch preview. Why: warm cream is a common tell of generated sites, and a cool tone fits the cleanroom subject.
 - **Fonts: Oxanium (display), Atkinson Hyperlegible Next (body), Kode Mono (data), all self-hosted.** Why: a futuristic voice limited to short strings, with readable body and data text that keeps confusable characters (O/0, l/1) distinct.
 
+## 2026-11-23: Repo infrastructure
+- **The palette has one source: `spec/materials.yaml`.** `pipeline/materials.py` loads it, and `pipeline/gen_materials_ts.py` generates `web/src/generated/materials.ts`, which is committed so the web build needs no Python. This *supersedes* "mirrored in `materials.py` and `materials.ts`." Why: hand-mirrored colors drift.
+- **The generator enforces STYLE.md §3.1.** CIE76 ΔE ≥ 15 for every pair listed in `adjacent_pairs`. A per-pair override requires a written reason (the two oxides use 9). Contrast against the scene background warns below 10; currently both oxides warn against the light background, to revisit in the STI tuning pass.
+
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

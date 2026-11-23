@@ -1,0 +1,97 @@
+# Single source of truth for every physical color in the project.
+# Read by pipeline/materials.py; web/src/generated/materials.ts is generated from it.
+# Edit colors here only. Rules: STYLE.md §3. Changes are logged in DECISIONS.md.
+version: 1
+
+shading:                      # STYLE.md §2
+  semiconductor: { roughness: 0.8, metalness: 0.0 }
+  dielectric:    { roughness: 0.8, metalness: 0.0 }
+  metal:         { roughness: 0.5, metalness: 0.25 }
+
+materials:                    # node names from CONVENTIONS.md
+  - { id: silicon,         hex: "#B9B7AE", shading: semiconductor, doping_tint: true,  label: "Si",                        name: "crystalline silicon" }
+  - { id: oxide_grown,     hex: "#CFE0DA", shading: dielectric,    doping_tint: false, label: "SiO<sub>2</sub>",           name: "grown silicon dioxide" }
+  - { id: oxide_deposited, hex: "#ECE7DA", shading: dielectric,    doping_tint: false, label: "SiO<sub>2</sub>",           name: "deposited silicon dioxide" }
+  - { id: nitride,         hex: "#9AAE6B", shading: dielectric,    doping_tint: false, label: "Si<sub>3</sub>N<sub>4</sub>", name: "silicon nitride" }
+  - { id: etchstop,        hex: "#66784A", shading: dielectric,    doping_tint: false, label: "SiCN",                      name: "silicon carbonitride etch stop" }
+  - { id: photoresist,     hex: "#F0CF62", shading: dielectric,    doping_tint: false, label: "Resist",                    name: "photoresist (with BARC)" }
+  - { id: polysilicon,     hex: "#8C8299", shading: semiconductor, doping_tint: false, label: "Poly-Si",                   name: "polycrystalline silicon" }
+  - { id: sige,            hex: "#CDB384", shading: semiconductor, doping_tint: true,  label: "SiGe:B",                    name: "boron-doped silicon-germanium" }
+  - { id: silicide,        hex: "#4E4A55", shading: metal,         doping_tint: false, label: "NiPtSi",                    name: "nickel-platinum silicide" }
+  - { id: highk,           hex: "#1FA99A", shading: dielectric,    doping_tint: false, label: "HfO<sub>2</sub>",           name: "hafnium oxide" }
+  - { id: metal_tin,       hex: "#B08A2A", shading: metal,         doping_tint: false, label: "TiN",                       name: "titanium nitride" }
+  - { id: metal_tan,       hex: "#8A6E52", shading: metal,         doping_tint: false, label: "TaN / Ta",                  name: "tantalum nitride / tantalum" }
+  - { id: metal_al,        hex: "#B4BDC9", shading: metal,         doping_tint: false, label: "Al",                        name: "aluminum" }
+  - { id: tungsten,        hex: "#737D8A", shading: metal,         doping_tint: false, label: "W",                         name: "tungsten" }
+  - { id: copper,          hex: "#C4682F", shading: metal,         doping_tint: false, label: "Cu",                        name: "copper" }
+  - { id: lowk,            hex: "#DCD3E8", shading: dielectric,    doping_tint: false, label: "Low-k",                     name: "low-k dielectric" }
+
+doping:                       # STYLE.md §3.2; stops at 1e16..1e20+ cm^-3
+  log10_min: 16
+  log10_max: 20
+  n: ["#D6E2F2", "#A9C3E6", "#6F9AD2", "#3A6FB8", "#1E4F96"]
+  p: ["#F4D9D6", "#E8ADA8", "#D7766E", "#C0473F", "#9A2A24"]
+
+accents:                      # STYLE.md §3.3; emissive only, never solid geometry
+  plasma:      "#9B6BFF"
+  ion_beam:    "#33C3F0"
+  uv_exposure: "#5B4BE0"
+  heat:        "#FF6B3D"
+  gas_flow:    "#E8E8E8"
+
+tool_hardware:                # STYLE.md §2
+  shell:    "#C9CDD2"
+  cut_face: "#B3B8BE"
+  fixture:  "#8E959D"
+
+scene_bg:                     # used only for the contrast warning
+  light: "#E9ECEF"
+  dark:  "#1B1D21"
+
+contrast:
+  min_delta_e: 15             # CIE76 ΔE for every pair below
+  bg_warn_delta_e: 10         # warn, don't fail, below this vs scene_bg
+
+# Materials that physically touch somewhere in the flow. Add a pair whenever a
+# step creates a new contact. Override min_delta_e only with a reason.
+adjacent_pairs:
+  - [silicon, oxide_grown]
+  - [silicon, oxide_deposited]
+  - [silicon, sige]
+  - [silicon, silicide]
+  - [silicon, nitride]
+  - [sige, silicide]
+  - [sige, nitride]
+  - { pair: [oxide_grown, oxide_deposited], min_delta_e: 9, reason: "Same material, different origin; subtle by design, edges carry the boundary" }
+  - [oxide_grown, nitride]
+  - [oxide_grown, polysilicon]
+  - [oxide_grown, highk]
+  - [oxide_grown, photoresist]
+  - [oxide_deposited, nitride]
+  - [oxide_deposited, photoresist]
+  - [oxide_deposited, metal_al]
+  - [oxide_deposited, tungsten]
+  - [oxide_deposited, lowk]
+  - [oxide_deposited, etchstop]
+  - [oxide_deposited, highk]
+  - [nitride, polysilicon]
+  - [nitride, photoresist]
+  - [nitride, highk]
+  - [nitride, silicide]
+  - [polysilicon, photoresist]
+  - [highk, metal_tin]
+  - [metal_tin, metal_tan]
+  - [metal_tin, metal_al]
+  - [metal_tan, metal_al]
+  - [metal_tin, tungsten]
+  - [metal_tin, silicide]
+  - [tungsten, silicide]
+  - [tungsten, metal_al]
+  - [tungsten, copper]
+  - [tungsten, metal_tan]
+  - [copper, metal_tan]
+  - [copper, etchstop]
+  - [metal_tan, lowk]
+  - [etchstop, lowk]
+  - [photoresist, lowk]
+  - [photoresist, etchstop]

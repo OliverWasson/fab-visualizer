@@ -42,7 +42,7 @@ Rules that every file and every chat follows. If something here changes, log it 
 - Doping is not geometry and is always labeled illustrative on screen.
 
 ## Material palette
-One color per material, used identically in every step and in both themes. Defined in `pipeline/materials.py` and mirrored in `web/src/materials.ts`. Hex values and the doping/accent colors live in `STYLE.md` §3.
+One color per material, used identically in every step and in both themes. Defined once in `spec/materials.yaml`. `pipeline/materials.py` loads it, and `web/src/generated/materials.ts` is generated from it (never edit the generated file by hand). `STYLE.md` §3 documents the values and the rules.
 
 | Node name | Material | Notes |
 |---|---|---|
