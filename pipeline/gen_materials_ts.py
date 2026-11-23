@@ -75,7 +75,9 @@ def render(p: mat.Palette) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--check", action="store_true", help="fail if the generated file is stale")
+    parser.add_argument(
+        "--check", action="store_true", help="fail if the generated file is stale"
+    )
     args = parser.parse_args()
 
     try:
@@ -98,7 +100,10 @@ def main() -> int:
     if args.check:
         current = OUT_PATH.read_text(encoding="utf-8") if OUT_PATH.exists() else ""
         if current != text:
-            print(f"{rel} is stale: run `python -m pipeline.gen_materials_ts`", file=sys.stderr)
+            print(
+                f"{rel} is stale: run `python -m pipeline.gen_materials_ts`",
+                file=sys.stderr,
+            )
             return 1
         print(f"{rel} is up to date ({len(palette.materials)} materials)")
         return 0

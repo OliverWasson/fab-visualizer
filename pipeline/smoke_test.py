@@ -3,6 +3,7 @@
 Conventions: units are nanometers, +z points up out of the wafer.
 glTF/three.js use +y up, so we rotate once at export.
 """
+
 from pathlib import Path
 
 import numpy as np
@@ -10,8 +11,8 @@ import trimesh
 from manifold3d import Manifold
 
 # Dimensions in nm (illustrative only, not real process geometry yet)
-W, D, H = 280.0, 120.0, 80.0          # slab width (x), depth (y), thickness (z)
-TRENCH_W, TRENCH_DEPTH = 40.0, 40.0   # trench width and depth
+W, D, H = 280.0, 120.0, 80.0  # slab width (x), depth (y), thickness (z)
+TRENCH_W, TRENCH_DEPTH = 40.0, 40.0  # trench width and depth
 
 OUT = Path(__file__).resolve().parents[1] / "web/public/models/smoke_test.glb"
 

@@ -59,6 +59,7 @@ class PaletteError(ValueError):
 
 # ---------- color math ----------
 
+
 def hex_to_srgb(h: str) -> tuple[float, float, float]:
     h = h.lstrip("#")
     return tuple(int(h[i : i + 2], 16) / 255 for i in (0, 2, 4))  # type: ignore[return-value]
@@ -88,6 +89,7 @@ def delta_e(a: str, b: str) -> float:
 
 
 # ---------- loading ----------
+
 
 def _check_hex(value: Any, where: str, errors: list[str]) -> None:
     if not isinstance(value, str) or not _HEX.match(value):
@@ -158,6 +160,7 @@ def load(path: Path = SPEC_PATH) -> Palette:
 
 # ---------- contrast rules (STYLE.md §3.1) ----------
 
+
 def check_contrast(p: Palette) -> tuple[list[str], list[str]]:
     """Return (errors, warnings) for adjacent-pair and background contrast."""
     errors: list[str] = []
@@ -173,7 +176,9 @@ def check_contrast(p: Palette) -> tuple[list[str], list[str]]:
             limit = entry.get("min_delta_e")
             reason = entry.get("reason")
             if limit is not None and not reason:
-                errors.append(f"adjacent pair {pair}: min_delta_e override needs a reason")
+                errors.append(
+                    f"adjacent pair {pair}: min_delta_e override needs a reason"
+                )
             limit = float(limit) if limit is not None else floor
         else:
             pair, limit = entry, floor
@@ -192,6 +197,8 @@ def check_contrast(p: Palette) -> tuple[list[str], list[str]]:
         for m in p.materials.values():
             de = delta_e(m.hex, bg)
             if de < bg_warn:
-                warnings.append(f"{m.id} vs {theme} scene background: ΔE {de:.1f} < {bg_warn:g}")
+                warnings.append(
+                    f"{m.id} vs {theme} scene background: ΔE {de:.1f} < {bg_warn:g}"
+                )
 
     return errors, warnings

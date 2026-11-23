@@ -54,6 +54,8 @@ Newest entries go at the bottom. Each entry has a date, the decision, and why. D
 ## 2026-11-23: Repo infrastructure
 - **The palette has one source: `spec/materials.yaml`.** `pipeline/materials.py` loads it, and `pipeline/gen_materials_ts.py` generates `web/src/generated/materials.ts`, which is committed so the web build needs no Python. This *supersedes* "mirrored in `materials.py` and `materials.ts`." Why: hand-mirrored colors drift.
 - **The generator enforces STYLE.md §3.1.** CIE76 ΔE ≥ 15 for every pair listed in `adjacent_pairs`. A per-pair override requires a written reason (the two oxides use 9). Contrast against the scene background warns below 10; currently both oxides warn against the light background, to revisit in the STI tuning pass.
+- **Every documented rule is checked automatically.** `python -m pipeline.check` validates the palette, the generated TS, and `spec/steps.yaml` (IDs and order, allowed values, text-tier word limits, notation, params with sources and confidence, required implant/thermal params, `fab_reality` sources). CI runs it with `black --check` and ESLint, and deploys from `main` only when all pass. Written in plain Python rather than pydantic, so it adds no dependency and could be tested end to end. Why: accuracy rules a person has to remember will eventually be missed.
+- **A missing `.glb` for a geometry step is a warning until M1 is done,** then becomes an error.
 
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

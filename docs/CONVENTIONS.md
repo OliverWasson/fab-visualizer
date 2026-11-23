@@ -105,7 +105,7 @@ One color per material, used identically in every step and in both themes. Defin
 
 ## Sources
 - Every parameter has a source key, for example `source: PG2023-ch2-p41-fig2.7`.
-- Full citations live in `spec/sources.md`.
+- Full citations live in `spec/sources.md`, one per `### <BASEKEY>` heading (for example `### PG2023`). A source key is the base key plus an optional locator after the first hyphen, so `PG2023-ch2-p41-fig2.7` resolves to `PG2023`.
 - Plummer & Griffin text and figures are **never copied**. Facts and parameters are paraphrased and cited; all geometry and images are our own.
 - Where the textbook differs from real fab practice, the step gets a `fab_reality` note with its own source.
 
@@ -117,4 +117,6 @@ One color per material, used identically in every step and in both themes. Defin
 ## Workflow
 - One branch per feature (`feat/sti-geometry`); merge to `main` when it works.
 - Commit after every working step. The message says what changed and why.
-- `main` auto-deploys to GitHub Pages.
+- Run `python -m pipeline.check` and `black pipeline` before committing. CI runs both (plus ESLint and the web build) on every push and pull request.
+- `main` auto-deploys to GitHub Pages, but only when every check passes.
+- The rules `pipeline/spec_check.py` enforces are the ones written in these docs. Change a rule in both places, and log it in `DECISIONS.md`.
