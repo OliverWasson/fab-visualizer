@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 
 function Model() {
-  const { scene } = useGLTF("/models/smoke_test.glb");
+  const { scene } = useGLTF(`${import.meta.env.BASE_URL}models/smoke_test.glb`);
   return <primitive object={scene} />;
 }
 
