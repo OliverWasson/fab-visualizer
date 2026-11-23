@@ -5,7 +5,8 @@ Every source cited in `spec/steps.yaml`. Format and rules: `CONVENTIONS.md` (Sou
 - One entry per `### <BASEKEY>` heading. Keys are `<FirstAuthorSurname or Org><Year>`, plus a letter if needed (`Smith2009a`), with no hyphens.
 - Required lines: **Citation**, **Type**, **Group**. Optional: **Link**, **Access**, **Notes**.
 - **Type** is one of `paper`, `teardown`, `textbook`, `review`, `roadmap`, `vendor`, `patent`, `news`.
-- **Group** marks independence. Sources from the same authors, the same company, or derived from one another share a group. A param marked `verified` needs sources from at least two different groups.
+- **Group** marks independence. Sources from the same authors, the same company, or derived from one another share a group. A source can list several groups, comma-separated (for example a paper with authors from two organizations). A param marked `verified` needs at least two sources that share no group.
+- For an edited handbook, cite each chapter as its own entry, since chapters have different authors. Keys use the chapter's first author.
 - Not acceptable as sources: Wikipedia, forums, blogs without primary references, or AI output. Use them only to find primary sources.
 - Never paste source text here. Summarize in your own words.
 
@@ -56,3 +57,63 @@ Every source cited in `spec/steps.yaml`. Format and rules: `CONVENTIONS.md` (Sou
   - Ch. 12, CMP (pp. 514–544): STI and ILD0 are the two dielectric CMP steps (pp. 514–516). STI CMP stops on nitride; oxide:nitride selectivity 3–100 (p. 529). Ceria slurry (≈5% CeO₂) gives better selectivity and less dishing than silica (p. 525, Fig. 12.26); silica slurry at pH 10–12 with KOH (p. 523). Dishing in wide STI regions (pp. 530–531). Removal rate several thousand Å/min; Preston equation (p. 528). Optical (spectroreflectometry) and motor-current endpoint (pp. 528, 538–539). PVA brush post-CMP clean (p. 540). Platen and pad, carrier with membrane, retaining ring, and pneumatic downforce, diamond pad conditioner, slurry dispenser (pp. 519–521). Gate-last needs poly-open CMP and metal CMP; dummy-gate removal increases channel strain (p. 544).
   - Ch. 13, Process Integration (pp. 549–562): ⟨100⟩ wafers, typical substrate doping 1×10¹⁵ cm⁻³, p-type more common for historical reasons (p. 550); advanced CMOS uses p-type wafers with p-epi (p. 551). Advanced STI flow (Fig. 13.7, p. 556): resist stripped after nitride/pad-oxide etch, Si etched with the nitride hard mask, liner oxide, HDP-CVD USG, CMP, anneal, wet strip of nitride and pad oxide. Pad oxide relieves nitride stress; nitride stripped in hot H₃PO₄ (pp. 552, 557). HDP oxide needs no anneal; O₃-TEOS needs >1000 °C in O₂ (pp. 555–556). No channel-stop implant at ≤1.8 V (p. 555). STI used as a stressor (p. 557).
   - Open conflicts: STI fill anneal is shown in Figs. 13.7 and 10.28 and on pp. 328 and 407, but p. 556 says HDP oxide needs none. Liner oxide 100–200 Å here vs. ≈5 nm in PG2023. P diffuses slower than B (p. 559) vs. nearly equal in PG2023.
+
+### Pan1998
+- **Citation:** J. T. Pan, D. Ouma, P. Li, D. Boning, F. Redeker, J. Chung, and J. Whitby, "Planarization and Integration of Shallow Trench Isolation," VLSI Multilevel Interconnection Conference (VMIC), Santa Clara, CA, June 1998.
+- **Type:** paper
+- **Group:** amat, boning
+- **Link:** https://boning.mit.edu/wp-content/uploads/2022/11/Planarization-and-Integration-of-Shallow-Trench-Isolation.pdf
+- **Notes:** Applied Materials + MIT; sub-0.25 µm era, so its numbers are historical, not 32 nm. Typical STI sequence (p. 1): pad oxide, LPCVD nitride, trench litho, trench etch, resist strip/clean, liner oxidation, CVD fill, CMP, post-CMP clean with light BHF dip, nitride strip, pad oxide strip, sacrificial oxide grow/strip, gate oxide. Nitride is the CMP stop, typically 170 nm then; its thickness is the budget for later lowering of the STI oxide surface, which should end at or slightly above the active Si to avoid gate wrap-around at the corner (p. 1, Table I itemizes recess, pattern effects, three wet etches, nitride loss, nonuniformity). Only HDP-CVD and O₃-TEOS (AP/SACVD) fill voids-free; SACVD is conformal, HDP gives a characteristic 45° faceted profile and self-planarizes over fine pitch (p. 3, Fig. 2). Standard slurry ≈4:1 oxide:nitride; high-selectivity slurries reported to 200:1 on blanket films, degrading at low active density (pp. 3–6).
+
+### Cleavelin2007
+- **Citation:** C. R. Cleavelin, L. Colombo, H. Niimi, S. Pas, and E. M. Vogel, "Oxidation and Gate Dielectrics," ch. 9 in Y. Nishi and R. Doering, eds., *Handbook of Semiconductor Manufacturing Technology*, 2nd ed. CRC Press, 2007 (confirm the copyright year on the title page).
+- **Type:** textbook
+- **Group:** cleavelin
+- **Access:** Record the access route here (check Dartmouth Libraries for a CRCnetBASE / Taylor & Francis copy). Personal copy in `references/`, never committed.
+- **Notes:** Cl (HCl and alternatives) is recommended for STI trench oxidation to neutralize metallic contamination (p. 9-5).
+
+### Timans2007
+- **Citation:** P. J. Timans, "Rapid Thermal Processing," ch. 11 in Y. Nishi and R. Doering, eds., *Handbook of Semiconductor Manufacturing Technology*, 2nd ed. CRC Press, 2007 (confirm the copyright year on the title page).
+- **Type:** textbook
+- **Group:** timans
+- **Access:** Record the access route here (check Dartmouth Libraries for a CRCnetBASE / Taylor & Francis copy). Personal copy in `references/`, never committed.
+- **Notes:** Table 11.1a (p. 11-2) lists pad oxide and STI liner oxide as RTP applications at 65–22 nm; the same table's 32 nm "FD-SOI" leading-technology row is a roadmap projection, not what shipped, so don't cite it. RTO gives more uniform trench liners with less crystal-orientation dependence and better corners; liner thickness varies at corners from stress and orientation (p. 11-76). Steam RTO improves STI corner rounding (p. 11-84).
+
+### Xia2007
+- **Citation:** L.-Q. Xia and M. Chang, "Chemical Vapor Deposition," ch. 13 in Y. Nishi and R. Doering, eds., *Handbook of Semiconductor Manufacturing Technology*, 2nd ed. CRC Press, 2007 (confirm the copyright year on the title page).
+- **Type:** textbook
+- **Group:** amat
+- **Access:** Record the access route here (check Dartmouth Libraries for a CRCnetBASE / Taylor & Francis copy). Personal copy in `references/`, never committed.
+- **Notes:** Authors at Applied Materials, so same group as Pan1998. HDP-CVD: SiH₄ + O₂ deposition with simultaneous Ar sputtering; HDP oxide qualified for STI without any post-deposition anneal; triangular top profile is its signature (p. 13-24, Fig. 13.10). Other CVD oxides normally need a post-deposition anneal in STI for etch resistance (p. 13-28). Pad oxide buffers Si/nitride thermal-mismatch stress; LPCVD nitride etches 10–15 Å/min vs. 900 Å/min for steam oxide in 6:1 BHF (p. 13-31).
+
+### Shinn2007
+- **Citation:** G. B. Shinn, V. Korthuis, G. Grover, S. Fang, and D. S. Boning, "Chemical–Mechanical Polishing," ch. 17 in Y. Nishi and R. Doering, eds., *Handbook of Semiconductor Manufacturing Technology*, 2nd ed. CRC Press, 2007 (confirm the copyright year on the title page).
+- **Type:** textbook
+- **Group:** boning
+- **Access:** Record the access route here (check Dartmouth Libraries for a CRCnetBASE / Taylor & Francis copy). Personal copy in `references/`, never committed.
+- **Notes:** Shares an author (Boning) with Pan1998. STI (p. 17-43): fill oxide deposited to slightly above the original Si level, then CMP stops on nitride, nitride removed in hot H₃PO₄; pattern-density effects; under-polish leaves nitride (device failure), over-polish dishes wide trenches; low-selectivity silica slurry erodes nitride in sparse regions; aids include reverse etch-back, dummy active fill, nitride cap layers; ceria under evaluation for selectivity but scratches more; blanket-wafer selectivity overstates patterned results.
+
+### Ventzek2007
+- **Citation:** P. L. G. Ventzek, S. Rauf, and T. Sparks, "Plasma Etch," ch. 21 in Y. Nishi and R. Doering, eds., *Handbook of Semiconductor Manufacturing Technology*, 2nd ed. CRC Press, 2007 (confirm the copyright year on the title page).
+- **Type:** textbook
+- **Group:** ventzek
+- **Access:** Record the access route here (check Dartmouth Libraries for a CRCnetBASE / Taylor & Francis copy). Personal copy in `references/`, never committed.
+- **Notes:** STI etch has two critical steps, nitride hard-mask patterning and Si etch (p. 21-18). Nitride etch as vertical as possible, e.g. CF₄/CHF₃ (p. 21-20). Si trench should have slightly sloped sidewalls (avoids seams in the CVD fill), rounded top corners (sharp corners raise leakage), and an oxidized bottom; the nitride must not be etched into the Si; uniform Si:nitride selectivity preserves CMP margin (p. 21-20). Example chemistry Cl₂–HBr–He–O₂ with SiOₓ sidewall deposition; more He–O₂ gives more taper (p. 21-20, citing Yeon & You, J. Vac. Sci. Technol. A 16, 1502, 1998). Taper vs. spacing: ≈66–80° over ≈0.1–10 µm spacing, open trenches more tapered, narrow ones more vertical (Fig. 21.11, p. 21-23, same source). No STI film thicknesses in Chs. 9, 11, 13, 17, or 21.
+
+### Quirk2001
+- **Citation:** M. Quirk and J. Serda, *Semiconductor Manufacturing Technology*. Prentice Hall, 2001.
+- **Type:** textbook
+- **Group:** quirk
+- **Access:** Record the access route here (check Dartmouth Libraries). Personal copy in `references/`, never committed. The copy read was a scan without a text layer (OCR'd) and ends near book p. 493, so the CMP chapter (STI oxide polish, p. 535) was not read.
+- **Notes:** Sub-0.25 µm era CMOS inverter flow. Ch. 4: 300 mm wafers 775 ± 20 µm (table from Huff et al. 1997, p. 76); "775 ± 25 µm" in text; notch and laser scribe (p. 82). Ch. 9 STI (pp. 207–210): ≈150 Å furnace-grown barrier (pad) oxide; LPCVD nitride from DCS + NH₃ at ≈750 °C as mask and CMP stop; STI litho; nitride, oxide, and Si etched with resist on, resist stripped after each etch; slanted profile and rounded bottom improve fill and isolation; ≈150 Å furnace liner oxide; fill by LPCVD furnace or other CVD (dated); CMP with nitride as the harder polish stop; post-CMP scrub; nitride strip in hot H₃PO₄. Flow drawn on p-epi over p⁺ substrate (Figs. 9.8–9.12). Ch. 10: STI liner 150–200 Å, passivates Si and blocks fill contamination (p. 238). Ch. 11: LPCVD nitride from DCS + NH₃ at 700–800 °C; nitride k ≈ 6.9 (p. 275). No nitride thickness given.
+
+### Wolf2002
+- **Citation:** S. Wolf, *Silicon Processing for the VLSI Era*, Vol. 4: *Deep-Submicron Process Technology*. Lattice Press, 2002.
+- **Type:** textbook
+- **Group:** wolf
+- **Access:** Record the access route here (check Dartmouth Libraries). Personal copy in `references/`, never committed. The copy read was a scan of two-page spreads (OCR'd); Ch. 9 read.
+- **Notes:** Ch. 9, STI (pp. 433–472); the §9.4 baseline is 0.25 µm era, with scaling trends in §9.5.
+  - Baseline flow (pp. 446–455): RCA clean; pad oxide 10–20 nm (≈10 nm in STI vs. 25–40 nm for LOCOS, since STI has no field oxidation); LPCVD nitride 100–200 nm as trench hard mask and CMP stop, also deposited on the wafer back; nitride/pad-oxide plasma etch in a dielectric etcher; Si trench etch in a second etcher (HBr/Cl₂/O₂ or HBr/NF₃/He/O₂), blind and timed, sidewalls 70–85° with rounded bottom corners; resist strip; short HF dip to undercut the pad oxide, which improves top-corner rounding; liner oxide 40–50 nm in dry O₂ (best rounding with RTO at 1050–1100 °C, Fig. 9-13), which also converts a thin nitride skin to oxynitride; CVD fill (LPCVD TEOS, AP/SA O₃-TEOS, or HDP), 800–900 nm over a 500 nm trench; densify ≈900 °C to cut wet-etch rate ≈20%; optional reverse-mask etchback; CMP stopping on nitride; short HF to remove the oxynitride skin, then hot H₃PO₄ nitride strip (also removes backside nitride); pad oxide strip in HF; ≈20 nm sacrificial oxide; well, channel-stop, Vt, and punch-through implants through it; sacrificial oxide strip, partly to avoid a Kooi-like gate-oxide thinning; gate oxide.
+  - Trends (pp. 449, 455–456): in-situ hard-mask-open single-etcher STI etch (resist on) in production by 2000 and more feasible as profiles steepen; slopes up to 88° for scaled trenches (Lam SEM shows 87°, Fig. 9-11); a 50 nm top-corner radius removes the I–V double hump for slopes ≤80° (p. 451); trench depth expected to fall below 0.2 µm near the 0.1 µm node (p. 456).
+  - HDP-CVD (p. 460): sputter rate peaks about 45° from normal, producing 45° facets at trench tops and bottom-up fill.
+  - p. 469 example stack (196 nm nitride, 15 nm liner) is an MIT test wafer, so it is not independent of Pan1998.
