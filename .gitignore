@@ -5,3 +5,9 @@ dist/
 __pycache__/
 *.pyc
 .vscode/
+
+# Reference material is never committed (textbook PDFs are personal-use only).
+# Keep local copies in references/, which is ignored entirely.
+*.pdf
+*.PDF
+references/

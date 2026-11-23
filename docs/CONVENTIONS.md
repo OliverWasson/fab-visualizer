@@ -106,6 +106,7 @@ One color per material, used identically in every step and in both themes. Defin
 ## Sources
 - Every parameter has a source key, for example `source: PG2023-ch2-p41-fig2.7`.
 - Full citations live in `spec/sources.md`, one per `### <BASEKEY>` heading (for example `### PG2023`). A source key is the base key plus an optional locator after the first hyphen, so `PG2023-ch2-p41-fig2.7` resolves to `PG2023`.
+- Reference PDFs are **never committed** (`*.pdf` and `references/` are gitignored). Keep local copies in `references/`.
 - Plummer & Griffin text and figures are **never copied**. Facts and parameters are paraphrased and cited; all geometry and images are our own.
 - Where the textbook differs from real fab practice, the step gets a `fab_reality` note with its own source.
 
