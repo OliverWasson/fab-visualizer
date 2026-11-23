@@ -1,6 +1,6 @@
 # Decisions log
 
-Newest at the bottom. Each entry: date, decision, why. Don't relitigate a logged decision without adding a new entry that supersedes it.
+Newest entries go at the bottom. Each entry has a date, the decision, and why. Don't relitigate a logged decision without adding a new entry that supersedes it.
 
 ## 2026-11-23: Device and flow
 - **Model a 28 nm-class planar, gate-last high-k/metal-gate CMOS inverter.**
@@ -26,7 +26,30 @@ Newest at the bottom. Each entry: date, decision, why. Don't relitigate a logged
 - Each step is cross-checked against at least one other source.
 - Consider asking the authors for permission or feedback before launch.
 
+## 2026-11-23: Scope (see SCOPE.md)
+- **Layered audience.** The primary reader has intro science/engineering background. Each step has `summary`, `explanation`, and `details` tiers. Why: one site that teaches by default and holds up to an engineer's scrutiny.
+- **A real standard-cell inverter, not the textbook's side-by-side layout.** One gate line crosses PMOS over NMOS, with dummy poly at the cell edges. Why: it's accurate, and the y-cut gives the 3D view something the book can't show.
+- **BEOL goes through V1 + M2.** Why: one dual-damascene module teaches the repeating unit of the interconnect stack.
+- **Granularity.** Every unit operation is a step, but only `geometry` steps emit a `.glb`. This *supersedes* "one `.glb` per step" in the Architecture entry. Why: avoids dozens of duplicate meshes, and lets thermal steps show doping change while the geometry stays still.
+- **Reference flow is a generic gate-last 28 nm foundry archetype,** with Intel 32 nm differences as notes. Gate-first flows are out of scope.
+- **Geometry corrections G1–G6 adopted** (SCOPE.md §7): true vertical scale; NMOS strain via tensile CESL instead of SiC:P; Σ-recess SiGe:B after the spacer with no PMOS deep implant; NiPt silicide before ILD0 with the gate hard mask kept; an offset spacer; retrograde wells with Vt implants under the well masks. G2–G4 are medium confidence and need verification.
+- **Module list changed:** `vt` merged into `well` (G6); `strain` renamed `sige`, since NMOS strain is now the CESL in `rmg`; `wafer`, `contact`, and `finfet` added.
+- **12 tool classes,** built in the Python pipeline and exported to `web/public/tools/`. This *supersedes* "~10 tool classes." Why: that's the number of distinct hardware types the corrected flow actually uses.
+- **Lithography:** a full walkthrough at the STI mask, then two steps per mask. Resist and BARC are one layer; the gate hard mask is modeled.
+- **Non-goals, FinFET epilogue (~5 states + static GAA), and an STI vertical slice first** (SCOPE.md §9–11).
+
+## 2026-11-23: Style (see STYLE.md)
+- **Technical-illustration rendering,** not photoreal. Why: nothing at this scale has a visible appearance, and matte, outlined solids keep every layer readable.
+- **Hue is reserved for physics.** Material, dopant type, and process energy each get their own color family. The UI is monochrome.
+- **Palette hex values set** (STYLE.md §3), with one tuning pass allowed during the STI slice.
+- **Oxide split into `oxide_grown` and `oxide_deposited`.** Resolves the open question. The names describe origin rather than tool, because the sub-nm chemical interfacial oxide is grown but not thermal.
+- **Added `etchstop` (SiCN)** for the BEOL Cu cap / etch-stop layers.
+- **Vertical exaggeration:** default 1×, toggle 1× / 2× / 4×, thin films handled by camera framing. Resolves the open question.
+- **Doping:** a baked 3D net-doping texture from the pipeline, sampled in the silicon and SiGe materials. Resolves the open question. Why: the physics stays offline in Python, the same split as the geometry.
+- **Typed transitions with pipeline-generated delta meshes.** Node names gain `__added` / `__removed` suffixes and `anchor__` empties.
+- **Camera flies to each step's framing,** with a Keep-my-view toggle. Each step sets a default section cut, plus presets and a free plane. Hash routing, since GitHub Pages has no SPA fallback.
+- **Light scene background is the cool neutral `#E9ECEF`**, not the warm cream used in the swatch preview. Why: warm cream is a common tell of generated sites, and a cool tone fits the cleanroom subject.
+- **Fonts: Oxanium (display), Atkinson Hyperlegible Next (body), Kode Mono (data), all self-hosted.** Why: a futuristic voice limited to short strings, with readable body and data text that keeps confusable characters (O/0, l/1) distinct.
+
 ## Open questions
-- Vertical exaggeration factor and UI for it.
-- Doping visualization: shader vs. baked texture.
-- Whether oxide splits into thermal vs. deposited materials visually.
+- None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.
