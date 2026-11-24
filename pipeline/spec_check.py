@@ -17,6 +17,7 @@ from pipeline.materials import REPO_ROOT
 STEPS_PATH = REPO_ROOT / "spec" / "steps.yaml"
 SOURCES_PATH = REPO_ROOT / "spec" / "sources.md"
 MODELS_DIR = REPO_ROOT / "web" / "public" / "models"
+MODULES_PATH = REPO_ROOT / "spec" / "modules.yaml"
 
 MODULES = (
     "wafer",
@@ -49,6 +50,7 @@ TOOLS = (
     "ecd",
 )
 TRANSITIONS = (
+    "intro",
     "deposit_conformal",
     "deposit_directional",
     "oxidize",
@@ -79,10 +81,12 @@ REQUIRED = (
 OPTIONAL = (
     "mask",
     "transition",
+    "story",
     "camera",
     "cut",
     "callouts",
     "params",
+    "physics",
     "fab_reality",
     "model",
     "doping_state",
@@ -243,6 +247,8 @@ def _check_step(
         r.err(where, f"kind {kind!r} not in {KINDS}")
     if s.get("tool") not in TOOLS:
         r.err(where, f"tool {s.get('tool')!r} not in {TOOLS}")
+    if "story" in s and not isinstance(s["story"], bool):
+        r.err(where, "story must be true or false")
     if "cut" in s and s["cut"] not in CUTS:
         r.err(where, f"cut {s['cut']!r} not in {CUTS}")
     if "camera" in s:
@@ -262,6 +268,8 @@ def _check_step(
             r.err(where, f"{kind} steps must use transition {kind!r}")
         elif kind == "geometry" and t in ("implant", "thermal"):
             r.err(where, f"geometry steps can't use transition {t!r}")
+        if t == "intro" and ids_so_far:
+            r.err(where, "transition 'intro' is only for the first step")
         if t and t.startswith("litho") and not s.get("mask"):
             r.warn(where, "litho step has no mask id")
 
@@ -309,6 +317,19 @@ def _check_step(
     for need in KIND_PARAMS.get(kind, ()):
         if need not in names:
             r.err(where, f"{kind} step missing param {need!r}")
+
+    for i, ph in enumerate(s.get("physics") or []):
+        pw = f"{where} physics[{i}]"
+        if not isinstance(ph, dict):
+            r.err(pw, "must be a mapping")
+            continue
+        for k in ("name", "equation", "explanation", "source"):
+            if not ph.get(k):
+                r.err(pw, f"missing {k!r}")
+        if isinstance(ph.get("explanation"), str) and words(ph["explanation"]) > 100:
+            r.err(pw, f"explanation is {words(ph['explanation'])} words (max 100)")
+        if ph.get("source"):
+            _resolve_sources(r, pw, ph["source"], sources)
 
     fr = s.get("fab_reality")
     if fr is not None:
@@ -371,4 +392,40 @@ def check_steps(path: Path = STEPS_PATH) -> tuple[list[str], list[str]]:
         _check_step(r, s, ids, sources)
         if isinstance(sid, str):
             ids.append(sid)
+    return r.errors, r.warnings
+
+
+def check_modules(path: Path = MODULES_PATH) -> tuple[list[str], list[str]]:
+    """Return (errors, warnings) for spec/modules.yaml (module goals and intros)."""
+    r = _Report()
+    if not path.exists():
+        r.warn("spec/modules.yaml", "not written yet")
+        return r.errors, r.warnings
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    if not isinstance(data, list):
+        r.err("spec/modules.yaml", "top level must be a list of modules")
+        return r.errors, r.warnings
+    last = -1
+    seen: set[str] = set()
+    for m in data:
+        mid = m.get("id") if isinstance(m, dict) else None
+        where = f"module {mid}"
+        if mid not in MODULES:
+            r.err(where, f"id not in {MODULES}")
+            continue
+        if mid in seen:
+            r.err(where, "listed twice")
+        seen.add(mid)
+        if MODULES.index(mid) < last:
+            r.err(where, "out of process order")
+        last = MODULES.index(mid)
+        for k in ("title", "goal", "intro"):
+            if not m.get(k):
+                r.err(where, f"missing {k!r}")
+        _check_text(r, where, "goal", m.get("goal", ""))
+        _check_text(r, where, "intro", m.get("intro", ""))
+        if isinstance(m.get("goal"), str) and words(m["goal"]) > 20:
+            r.err(where, f"goal is {words(m['goal'])} words (max 20)")
+        if isinstance(m.get("intro"), str) and words(m["intro"]) > 80:
+            r.err(where, f"intro is {words(m['intro'])} words (max 80)")
     return r.errors, r.warnings

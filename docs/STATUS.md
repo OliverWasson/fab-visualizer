@@ -5,7 +5,8 @@ Handoff for the next chat. Read this first, then `SCOPE.md`, `DECISIONS.md`, `CO
 ## Where things stand
 
 - **Live site:** https://oliverwasson.github.io/fab-visualizer/ (M0 smoke test). Repo: github.com/OliverWasson/fab-visualizer.
-- **Milestone:** M1, the STI vertical slice (SCOPE.md §11). **Sourcing and cell layout are done.** Nothing in `spec/steps.yaml` yet.
+- **Milestone:** M1, the STI vertical slice (SCOPE.md §11). **Sourcing and cell layout are done.** `spec/steps.yaml` has the first three steps (wafer, pad oxide, nitride) in the new public voice; `spec/modules.yaml` has the `wafer` and `sti` intros.
+- **Approach:** engagement first (DECISIONS.md "Engagement first"). Summary and explanation are for a curious non-specialist, following STYLE.md §12; rigor lives in `details`. Story mode shows ~20–25 `story: true` steps.
 - **Branch:** recent work is on `feat/intel32-anchor`. Merge it to `main` once CI is green (`git checkout main && git merge --ff-only feat/intel32-anchor && git push`).
 
 ### Done
@@ -18,12 +19,14 @@ Handoff for the next chat. Read this first, then `SCOPE.md`, `DECISIONS.md`, `CO
 - Cell layout: `masks/inverter.yaml` (Nangate INV_X1 scaled to Intel pitches), checked by `pipeline/mask_check.py`.
 
 ### Next, in order
+0. **Scope is locked until M1 ships.** After the STI slice works, test it with 3–5 people with no technical background (where they get bored, confused, or say "wait, really?"), then decide the backlog (SCOPE.md §13).
 1. Merge `feat/intel32-anchor` to `main`.
-2. Write `spec/steps.yaml` entries for `wafer` and `sti`, with all three text tiers and sourced params (values below). The checker validates as you go.
+2. Write the remaining `sti` steps in `spec/steps.yaml`, matching the voice and format of the first three (the reference). Mark `story: true` on the pivotal or most visual ones (about 4–5 for STI: the trench etch, fill, and CMP are good candidates). The checker validates as you go.
 3. Pipeline geometry for each geometry step, with `__added` / `__removed` delta meshes (CONVENTIONS.md).
 4. Tool panels: `furnace`, `rtp`, `litho` (full tour), `etch`, `wet`, `cvd`, `cmp`.
 5. Transitions, camera presets, section cuts; palette tuning pass; self-host fonts (verify the `@fontsource` packages).
-6. Deferred infrastructure: performance budget + WebGL2 fallback message; root README (replace the Vite template in `web/README.md`).
+6. Later milestones now include M7 (powers-of-ten intro, switching finale); add `physics` entries where a step has a governing model (oxidation, CMP, etc.).
+7. Deferred infrastructure: performance budget + WebGL2 fallback message; root README (replace the Vite template in `web/README.md`).
 
 ## Values for the `wafer` and `sti` steps
 

@@ -90,5 +90,21 @@ This *supersedes* "STI module choices" (2026-11-23) where they differ.
 - **One deviation from Nangate:** the input M1 pad is widened left so the input via shares the M2 track.
 - **Masks are checked automatically** (`pipeline/mask_check.py`): cell = 2 CPP × tracks × M1 pitch; gate and dummies lg wide at 0 and ±CPP; contacts inside their active or poly and on the right M1 net; gate contact over STI; vias inside matching M1 and M2; no M1 or M2 shorts; wells split in the STI gap; params sourced.
 
+## 2026-11-24: Engagement first
+- **The primary reader is now a curious non-specialist,** not someone with engineering background. The summary and explanation tiers are written for them, in the voice in STYLE.md §12; rigor stays in `details`, collapsed by default. This *supersedes* the audience in the 2026-11-23 Scope entry. Why: the site should leave everyone with something exciting and true, while still holding up to an engineer.
+- **Story mode is the default:** about 20–25 `story: true` steps, with skipped steps played as a labeled montage and an "Every step" toggle. Why: about 70 steps is too many for a casual visit, but hiding steps would break the honesty principle.
+- **Module goals and intros live in `spec/modules.yaml`.**
+- **Transition type `intro`** for the first step, replacing a placeholder.
+- **Scale comparisons are allowed in the public tiers** when computed from a sourced value, with the arithmetic and the everyday reference value stated in `details`.
+
+## 2026-11-24: Intro, finale, and Go deeper
+- **Powers-of-ten intro and an interactive switching finale** move into scope as milestone M7; the launch review becomes M8. The finale is illustrative, so the no-electrical-simulation non-goal stands. Why: they bookend the experience for a general audience.
+- **Optional `physics` entries per step** ("Go deeper"): the governing model, its equation, a student-level explanation, and a source, with constants as sourced params. Why: it's what makes the site useful to engineering students, at low cost per step.
+
+## 2026-11-24: Interaction, tool photos, and backlog
+- **"Do the step" gestures on story steps** (hold to etch, drag to polish) drive the existing transitions. Why: doing beats watching, at almost no extra cost. **Parameter tweaking stays out:** accurate consequences would need process simulation, and anything simpler would be cartoon physics.
+- **One real, licensed photo per tool class,** behind a "See the real one" tap. Why: the gap between schematic and reality (a box the size of a bus) is itself a wow moment. Each photo needs a license recorded in ATTRIBUTIONS.md.
+- **Backlog until after the first user test** (SCOPE.md §13): curated "what goes wrong" cases, a days-in-the-fab indicator, share images. Why: build M1 and test it with non-technical people before adding more.
+
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

@@ -1,0 +1,287 @@
+# Process steps, in process order. Schema: CONVENTIONS.md (Spec schema); tiers and story mode:
+# SCOPE.md §2; voice: STYLE.md §12; notation: STYLE.md §5; transitions: STYLE.md §7.
+# Checked by `python -m pipeline.check`.
+#
+# Conventions used in this file:
+#   - Text uses HTML <sub>/<sup> markup and a thin space (U+2009) between a number and its unit.
+#   - Inline citations in details are written [SourceKey-locator], resolving to spec/sources.md.
+#   - A param value is a number when the pipeline consumes it (write floats as 1.0e+15:
+#     PyYAML reads 1e15 as a string), and a string for ranges, chemistry, and labels.
+#   - Developer notes go in comments like these, never in reader text.
+
+# Model: z = 0 is this original surface; every later depth is measured from it.
+# Open: how the cell is oriented relative to the notch, which sets the channel
+# direction and whether trench sidewalls are (110) (SCOPE.md §12).
+- id: wafer-01-substrate
+  module: wafer
+  title: Starting wafer
+  kind: geometry
+  tool: wet
+  mask: null
+  story: true
+  transition:
+    type: intro
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: substrate
+      text: Single-crystal silicon
+  summary: >-
+    Every chip starts as a mirror-smooth disk of silicon, sliced from one giant,
+    nearly flawless crystal.
+  explanation: >-
+    This 300 mm disk is a single crystal, with its atoms lined up from edge to
+    edge, and one of the purest materials people make. A faint trace of boron
+    gives it a slightly positive, or p-type, character. The disk is 775 µm thick,
+    about the width of eight human hairs, yet every transistor will live in
+    roughly its top thousandth. First, chemical baths wash off dirt and the thin
+    skin of oxide that forms in air.
+  details: >-
+    A wafer is ordered by diameter, crystal orientation, doping type, and doping
+    level [PG2023-ch2-p37]. Its surface is a (100) crystal plane, which forms
+    the best interface with silicon dioxide [PG2023-ch2-p37]. A 300 mm wafer
+    is 775 µm thick, and a notch in its edge marks the crystal orientation
+    [Xiao2012-ch4-p105]. Wafers this size are sliced from a single crystal pulled
+    from molten silicon, the Czochralski method [Xiao2012-ch4-p103]. Apart from
+    oxygen, carbon, and the deliberate dopant, impurities are in the parts per
+    trillion, and every atom sits on its lattice site [PG2023-ch2-p37].
+
+    The sources agree that p-type substrates are the usual choice but give
+    different reasons: easier uniform crystal growth [PG2023-ch2-p37], or mostly
+    history [Xiao2012-ch13-p550]. The NMOS transistor could be built directly in
+    the p-type substrate, but separate wells are more common because implanted
+    well doping is far better controlled than the wafer's own doping
+    [PG2023-ch2-p37]. A boron level near 1×10<sup>15</sup> cm<sup>−3</sup>
+    corresponds to a resistivity of roughly 5–20 Ω·cm [PG2023-ch2-p37].
+
+    The incoming clean is described rather than modeled. A baseline STI flow
+    begins with an RCA wet clean [Wolf2002-ch9-p446], and a dilute HF dip removes
+    the 1–2 nm native oxide just before oxidation
+    [Xiao2012-ch5-p130, Xiao2012-ch9-p326].
+
+    Comparisons: eight hairs assumes a hair width of about 90 µm (775 ÷ 90 ≈ 8.6).
+    The top thousandth of 775 µm is about 0.8 µm; the deepest structures in
+    this module, the 200 nm isolation trenches, sit well inside it
+    [Natarajan2008-tab1]. The model shows only the top of the wafer; the rest
+    continues to the full 775 µm.
+  params:
+    - name: diameter
+      value: 300
+      unit: mm
+      source: [Xiao2012-ch4-tab4.2, Quirk2001-ch4-p76]
+      confidence: verified
+    - name: thickness
+      value: 775
+      unit: µm
+      source: [Xiao2012-ch4-tab4.2, Quirk2001-ch4-p76]
+      confidence: verified
+    - name: orientation_mark
+      value: notch
+      unit: null
+      source: [Xiao2012-ch4-p105, Quirk2001-ch4-p82]
+      confidence: verified
+    - name: surface_orientation
+      value: "(100)"
+      unit: null
+      source: [PG2023-ch2-p37, Xiao2012-ch13-p550]
+      confidence: verified
+    - name: conductivity_type
+      value: p
+      unit: null
+      source: [PG2023-ch2-p37, Xiao2012-ch13-p550]
+      confidence: verified
+    - name: dopant
+      value: boron
+      unit: null
+      source: PG2023-ch2-p37
+      confidence: single-source
+    - name: doping
+      value: 1.0e+15
+      unit: cm<sup>−3</sup>
+      source: [PG2023-ch2-p37, Xiao2012-ch13-p550]
+      confidence: verified
+    - name: resistivity
+      value: "5–20"
+      unit: Ω·cm
+      source: PG2023-ch2-p37
+      confidence: single-source
+    - name: incoming_clean
+      value: RCA clean
+      unit: null
+      source: Wolf2002-ch9-p446
+      confidence: single-source
+    - name: native_oxide_strip
+      value: "10:1 HF"
+      unit: null
+      source: Xiao2012-ch9-p326
+      confidence: single-source
+  fab_reality:
+    note: >-
+      Advanced CMOS usually starts on an epitaxial wafer: a lightly doped p-type
+      silicon layer grown by the wafer maker on a more heavily doped substrate.
+      The epi layer is silicon on silicon, so it would look identical here and
+      is not drawn. Intel's 32 nm starting wafer is not published.
+    source: [Xiao2012-ch4-p109, Xiao2012-ch13-p551, Quirk2001-ch9-fig9.8]
+
+# Model: oxide top at z ≈ +8.2 nm, silicon surface at z ≈ −6.8 nm (0.45 of 15 nm consumed).
+- id: sti-01-pad-oxide
+  module: sti
+  title: Pad oxide
+  kind: geometry
+  tool: furnace
+  mask: null
+  transition:
+    type: oxidize
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: pad_oxide
+      text: Pad oxide, 15 nm
+    - anchor: original_surface
+      text: Original silicon surface
+  summary: >-
+    Baking the wafer in oxygen grows a glassy layer just 15 nm thick, the first
+    of many temporary layers.
+  explanation: >-
+    Near 1000 °C in pure oxygen, the silicon surface turns into silicon
+    dioxide, the same compound as glass. The glass grows by eating into the
+    silicon, so the surface ends up slightly lower than where it started. Why
+    now? The next layer, silicon nitride, pulls so hard on whatever it touches
+    that it could crack the crystal, and this thin glass is the cushion between
+    them. Both layers are scaffolding, gone before any transistor exists.
+  details: >-
+    About 15 nm is the middle of the usual 10–20 nm range for a pad oxide
+    under nitride [Xiao2012-ch5-p132, Quirk2001-ch9-p208]. A 0.25 µm-era STI
+    flow used about 10 nm, thinner than the 25–40 nm used for LOCOS, since
+    STI has no long field oxidation [Wolf2002-ch9-p446]; another textbook gives
+    10–50 nm [PG2023-ch6-p243].
+
+    LPCVD nitride carries stress up to about 10<sup>10</sup> dyn/cm<sup>2</sup>
+    (1 GPa), which the pad oxide buffers [Xiao2012-ch5-p132]; without it, that
+    stress can damage the wafer [Xiao2012-ch13-p557]. Part of the stress comes
+    from the different thermal expansion of silicon and nitride
+    [Xia2007-ch13-p31].
+
+    Thin oxides are grown in dry O<sub>2</sub> at about 1000 °C with HCl
+    added [Xiao2012-ch5-p140]; chlorine helps neutralize metal contamination
+    [Cleavelin2007-ch9-p5]. No source gives the time for this node, so the
+    model sets the thickness directly. The step usually runs in a vertical
+    batch furnace [Quirk2001-ch9-p208]; rapid thermal oxidation is also listed
+    for pad oxides at the 65–22 nm nodes [Timans2007-ch11-tab11.1a].
+
+    Oxidation consumes silicon. The oxide takes up about 2.2 times the volume
+    of the silicon it replaces [PG2023-ch2-p39], so about 0.45 of its thickness
+    lies below the original surface: here about 6.8 nm below and 8.2 nm above.
+    The pad oxide is stripped at the start of the well module, after the STI
+    is finished [Wolf2002-ch9-p453].
+  params:
+    - name: thickness
+      value: 15
+      unit: nm
+      source: [Xiao2012-ch5-p132, Quirk2001-ch9-p208]
+      confidence: verified
+    - name: ambient
+      value: dry O<sub>2</sub> + HCl
+      unit: null
+      source: Xiao2012-ch5-p140
+      confidence: single-source
+    - name: temperature
+      value: 1000
+      unit: °C
+      source: Xiao2012-ch5-p140
+      confidence: single-source
+    - name: si_consumed_fraction
+      value: 0.45
+      unit: null
+      source: PG2023-ch2-p39
+      confidence: single-source
+
+- id: sti-02-nitride
+  module: sti
+  title: Nitride deposition
+  kind: geometry
+  tool: furnace
+  mask: null
+  story: true
+  transition:
+    type: deposit_conformal
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: nitride
+      text: Silicon nitride, 100 nm
+    - anchor: pad_oxide
+      text: Pad oxide cushion
+  summary: >-
+    A hard, oxygen-proof film of silicon nitride coats the wafer: a stencil, a
+    shield, and a stop sign.
+  explanation: >-
+    Two gases react in a hot, low-pressure furnace and leave an even film of
+    silicon nitride, about 100 nm thick, on every wafer in the batch. This
+    tough layer has three jobs. It becomes the stencil for carving trenches, it
+    shields the silicon from oxygen while the trench walls are treated, and it
+    acts as a stop sign when a later step polishes the wafer flat. Then it, too,
+    gets stripped away.
+  details: >-
+    About 100 nm is uncertain. The available values are from the 0.25 µm
+    era: 100–200 nm [Wolf2002-ch9-p447] and a typical 170 nm [Pan1998-p1];
+    no source gives a 32 nm value. The thickness matters later, because it is
+    the budget for every step that lowers the STI oxide, which should end level
+    with or slightly above the active silicon [Pan1998-p1].
+
+    The process is LPCVD (low-pressure chemical vapor deposition) in a
+    furnace-like reactor with a vertical wafer boat, at 0.1–1 Torr
+    [Xiao2012-ch10-p375]. Low pressure keeps the film uniform across a large
+    batch of wafers [PG2023-ch2-p38]. Dichlorosilane
+    (SiH<sub>2</sub>Cl<sub>2</sub>) and ammonia (NH<sub>3</sub>) react at
+    700–800 °C [Xiao2012-ch5-p165, Quirk2001-ch11-p275], leaving ammonium
+    chloride (NH<sub>4</sub>Cl) as a byproduct [Xiao2012-ch5-p166]. Silane
+    (SiH<sub>4</sub>) with ammonia also works, at about 900 °C
+    [Xiao2012-ch5-p166].
+
+    Nitride can't simply be grown: the oxide already on the surface keeps the
+    silicon from reacting with nitrogen, and direct nitridation is
+    self-limiting [PG2023-ch2-p38].
+
+    Nitride barely etches in HF, about 1–1.5 nm/min in 6:1 buffered HF
+    against about 90 nm/min for steam-grown oxide [Xia2007-ch13-p31], so it
+    survives the HF dips later in the module. The film also coats the back of
+    the wafer, and the later nitride strip removes it [Wolf2002-ch9-p447]; the
+    model shows the front only.
+  params:
+    - name: method
+      value: LPCVD
+      unit: null
+      source: [Xiao2012-ch5-p165, Quirk2001-ch9-p208, PG2023-ch2-p38]
+      confidence: verified
+    - name: thickness
+      value: 100
+      unit: nm
+      source: [Wolf2002-ch9-p447, Pan1998-p1]
+      confidence: uncertain
+    - name: precursors
+      value: SiH<sub>2</sub>Cl<sub>2</sub> + NH<sub>3</sub>
+      unit: null
+      source: [Xiao2012-ch5-p165, Quirk2001-ch11-p275, PG2023-ch2-p38]
+      confidence: verified
+    - name: temperature
+      value: "700–800"
+      unit: °C
+      source: [Xiao2012-ch5-p165, Quirk2001-ch11-p275]
+      confidence: verified
+    - name: pressure
+      value: "0.1–1"
+      unit: Torr
+      source: Xiao2012-ch10-p375
+      confidence: single-source
+    - name: film_stress
+      value: up to 1×10<sup>10</sup>
+      unit: dyn/cm<sup>2</sup>
+      source: Xiao2012-ch5-p132
+      confidence: single-source
+  fab_reality:
+    note: >-
+      Plummer & Griffin (p. 38) write the dichlorosilane precursor as
+      "Si<sub>2</sub>Cl<sub>2</sub>"; it should read
+      SiH<sub>2</sub>Cl<sub>2</sub>.
+    source: [PG2023-ch2-p38, Xiao2012-ch5-p165]

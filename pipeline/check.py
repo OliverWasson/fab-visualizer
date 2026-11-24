@@ -43,6 +43,10 @@ def main() -> int:
     errors += [f"steps: {x}" for x in e]
     warnings += [f"steps: {x}" for x in w]
 
+    e, w = spec_check.check_modules()
+    errors += [f"modules: {x}" for x in e]
+    warnings += [f"modules: {x}" for x in w]
+
     e, w = mask_check.check_masks()
     errors += [f"masks: {x}" for x in e]
     warnings += [f"masks: {x}" for x in w]

@@ -80,6 +80,7 @@ One color per material, used identically in every step and in both themes. Defin
   mask: null                # mask id on litho steps
   transition:
     type: deposit_conformal # see STYLE.md §7
+  story: true               # optional; shown in story mode (default false)
   camera: overview          # preset or {target: [x,y,z], distance: nm}
   cut: nmos_x               # pmos_x | nmos_x | gate_y | free | off
   callouts:                 # max 3
@@ -94,14 +95,21 @@ One color per material, used identically in every step and in both themes. Defin
       unit: null
       source: PG2023-ch2-p38      # one key, or a list of keys
       confidence: single-source   # verified | single-source | uncertain
+  physics:                  # optional "Go deeper" models (STYLE.md §12)
+    - name: ...
+      equation: ...         # KaTeX source
+      explanation: ...      # ≤ 100 words, student level
+      source: ...
   fab_reality:              # optional
     note: ...
     source: ...
 ```
 
 - `model` and `doping_state` default to the latest available. Set them explicitly only to override.
+- The first step uses transition `intro` (a reveal with no material change).
+- `spec/modules.yaml` lists each module once, in process order: `id`, `title`, `goal` (≤ 20 words), and `intro` (≤ 80 words), written in the public voice (STYLE.md §12).
 - Implant steps include `species`, `energy`, `dose`, `tilt`, and `twist` params. Thermal steps include `temperature`, `time`, and `ambient`.
-- `confidence`: `verified` means two or more independent sources agree, which the checker enforces as sources from at least two different **Group**s in `sources.md`; `single-source` means one; `uncertain` means flagged and not yet confirmed.
+- `confidence`: `verified` means two or more independent sources agree, which the checker enforces as two or more sources that share no **Group** in `sources.md` (a source may list several groups); `single-source` means one; `uncertain` means flagged and not yet confirmed.
 
 ## Sources
 - Every parameter has a source key, for example `source: PG2023-ch2-p41-fig2.7`.

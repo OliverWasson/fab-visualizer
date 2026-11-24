@@ -23,6 +23,7 @@ How the site looks, moves, and reads. Approved 2026-11-23. Any change goes throu
   - hardware in neutral grays: shell `#C9CDD2`, cut faces `#B3B8BE`, fixtures `#8E959D`
   - the wafer in the material palette
   - only process elements (plasma, beam, gas, slurry, light) carry accent colors
+- **Real tool photos:** shown only on request ("See the real one"), as an overlay on the tool inset with credit and license under it. Never recolored or edited beyond cropping.
 
 ## 3. Color
 
@@ -145,8 +146,11 @@ Each step's `transition.type` selects an animator. The pipeline supplies the del
 - Easing: ease-in-out cubic for growth and morphs; linear for clip sweeps.
 - The camera flies before the transition starts.
 - Every transition can be scrubbed and paused.
+- **Do the step (story steps):** the viewer's gesture drives the transition's progress: press-and-hold for timed processes (etch, deposition, oxidation, implant), drag for CMP and wafer loading. Releasing early pauses; finishing advances. Keyboard: hold Space. A plain Next button is always available as well, and reduced motion uses it alone.
 - **Reduced motion:** a 300 ms crossfade, no particles, and the camera jumps instead of flying.
-- UI motion is limited to responses to the user's own actions (panel open, step change). No decorative entrance animations. The one orchestrated moment is the intro (a powers-of-ten zoom, stretch goal).
+- UI motion is limited to responses to the user's own actions (panel open, step change). No decorative entrance animations. The two orchestrated moments are the intro and the finale.
+- **Intro (powers of ten):** about 15 s, skippable at any point, ending on the wafer step. A scale label (e.g. "1 cm", "10 µm", "100 nm") stays on screen throughout. Reduced motion: a sequence of stills with a Next button.
+- **Finale (switching):** an input toggle (0/1). The conducting transistor's channel glows in the dopant color of its carriers, and the output node and wires shift between VDD and ground, over about 0.6 s. A persistent "Illustrative" badge, the same rule as doping.
 
 ## 8. Camera, section, navigation
 
@@ -155,6 +159,8 @@ Each step's `transition.type` selects an animator. The pipeline supplies the del
 - **Fly policy:** on step change, a 1.2 s ease-in-out flight to the step's framing. A "Keep my view" toggle suppresses this; "Reset view" returns to the step's framing.
 - **Section plane:** presets `pmos_x`, `nmos_x`, `gate_y`, a `free` draggable plane, and `off`. Each step picks its default cut.
 - **Navigation:** a module-segmented timeline, ←/→ keys, and deep links via hash routing (`#/step/<step-id>`). GitHub Pages has no SPA fallback for path routes.
+- **Story mode (default):** the timeline shows only `story: true` steps. Advancing from one story step to the next plays the skipped steps in between as a montage, about 0.6 s each, with their titles shown, so every material change stays visible. A toggle ("Every step") reveals the full list. Deep links to a non-story step switch the toggle on. Under reduced motion the montage becomes a single crossfade with the skipped titles listed.
+- **Module intro:** entering a module shows its goal line and intro from `spec/modules.yaml`, in both modes.
 
 ## 9. Layout
 
@@ -200,3 +206,17 @@ Mobile (< 768 px)
 - The canvas `aria-label` is the current step's `summary`.
 - Doping and materials are never identified by hue alone (§1.5).
 - `prefers-reduced-motion` is honored (§7).
+
+## 12. Voice
+
+How the public tiers (`summary`, `explanation`, module goals and intros) are written. The details tier keeps a precise technical register.
+
+- **Write for a curious reader with no science background.** No acronyms or jargon; if a term is unavoidable, say what it is in the same breath ("silicon dioxide, the same compound as glass").
+- **Lead with something interesting.** The summary is a hook, not a label.
+- **Each explanation answers three questions:** What am I looking at? Why does it happen now? What's the wow? The wow is one of: scale, stakes ("if this cracks, the chip is dead"), or temporary versus permanent ("this layer is scaffolding").
+- **Short sentences, active voice, present tense.** One idea per sentence.
+- **Excitement comes from facts, not adjectives.** No hype words (amazing, incredible, revolutionary) and no exclamation marks.
+- **Comparisons must be true.** A scale comparison computed from a sourced value is allowed when `details` states the arithmetic and the everyday reference value used (for example, a hair width of ≈90 µm).
+- **Repeat the throughline:** most early layers are temporary scaffolding. Say so when one appears and when it's removed.
+- **Developer notes never go in reader text.** Implementation notes belong in YAML comments.
+- **"Go deeper" (`physics`) is written for an engineering student:** name the model, give the equation, say in two or three sentences what each term means physically and when the model holds, and cite it. Equations render with KaTeX.

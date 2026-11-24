@@ -11,24 +11,30 @@ Accuracy is the top priority:
 - Uncertainty is flagged in the data, not just in prose.
 - Places where the textbook flow differs from real fab practice are called out explicitly.
 
-## 2. Audience and text depth
+## 2. Audience, voice, and story mode
 
-**Primary reader:** someone with intro-level science or engineering background. They know roughly what a transistor is but not how one is manufactured.
+**Primary reader:** a curious non-specialist, a teenager or adult with no science or engineering background. Engagement comes first: every step should leave them with something exciting and true.
 
-**Secondary readers:** EE students, process engineers, and reviewers (hiring managers, the textbook authors) who open the details to check rigor.
+**Secondary readers:** students, process engineers, and reviewers (hiring managers, the textbook authors) who open the details to check rigor.
 
 Every step carries three text tiers:
 
 | Field | Reader | Length | Content |
 |---|---|---|---|
-| `summary` | anyone | one line, ≤ 20 words | What happens, in plain words |
-| `explanation` | primary reader | 2–4 sentences, ≤ ~80 words | What happens and why it happens at this point in the order |
-| `details` | engineer | open-ended, collapsible | Parameters table, equations, `fab_reality`, metrology notes |
+| `summary` | everyone | one line, ≤ 20 words | A hook: what happens, said so it's interesting |
+| `explanation` | everyone | 3–5 short sentences, ≤ ~80 words | What you're seeing, why it happens now, and one wow (scale, stakes, or what's temporary) |
+| `details` | engineer | open-ended, collapsed by default | Technical terms, parameters, citations, `fab_reality`, metrology, the arithmetic behind any comparison |
+| `physics` | student | optional, inside details ("Go deeper") | The governing model where a step has one: name, equation, a short explanation, and its source; constants are sourced params |
+
+Each module also gets a one-line goal and a short intro in `spec/modules.yaml`, so the reader always knows what's being built and why.
 
 Writing rules:
+- Accuracy is not traded for excitement. Every analogy must be true, and every claim in the public tiers traces to a source (via `details`).
+- The public tiers need no background. Technical vocabulary and acronyms live in `details`; STYLE.md §12 has the voice guide.
 - All wording is original. Plummer & Griffin is paraphrased and cited, never copied.
 - Explain ordering. The main thing Ch. 2 teaches is *why this step comes here*.
-- A term is defined in the tier where it first appears.
+
+**Story mode.** About 70 steps is too many for a casual visit, so the site opens in story mode: roughly 20–25 steps marked `story: true`, chosen for being visual or pivotal. Skipped steps still happen: moving between story steps plays them as a quick labeled montage, so nothing is hidden. A toggle shows every step for completists. Navigation details are in STYLE.md §8.
 
 ## 3. Reference flow
 
@@ -139,6 +145,8 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 - An inset tool panel shows the step's tool as a cutaway, with the active region highlighted and a process animation.
 - The first time each tool appears, the user gets a guided tour of 4–6 labeled components. Later uses skip the tour.
 - A Tools index page lists all 12.
+- **Real photos:** each tool class gets one real photo behind a "See the real one" tap, with a person or object for scale. Every photo needs a license (Creative Commons, or written permission from the vendor or fab), recorded in `ATTRIBUTIONS.md`. A tool with no licensable photo ships without one.
+- **Do the step:** on story steps, the viewer performs the action instead of pressing Next (hold to etch, drag the polishing pad, slide the wafer into the furnace). It drives the same scrubbable transition; nothing about the result changes. Parameter tweaking stays a non-goal (§9).
 
 ### 8.3 Lithography
 
@@ -148,11 +156,11 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 
 ## 9. Non-goals (v1)
 
-- No electrical simulation (no TCAD, no computed I-V). The final step explains switching qualitatively, with a transfer curve labeled illustrative.
+- No electrical simulation (no TCAD, no computed I-V). The switching finale (§11, M7) is an illustrative animation, labeled as such.
 - Doping is illustrative: computed from sourced implant and anneal parameters with simple models (Gaussian implants, √(Dt) broadening), not calibrated.
 - One device flavor: core-Vt NMOS and PMOS only. A note explains that real chips also carry multiple Vt flavors and thick-oxide I/O devices.
 - No crystal growth, wafer making, dicing, packaging, test, or yield/economics. Crystal growth and wafer making get one intro paragraph.
-- No parameter tweaking or "what if" mode.
+- No parameter tweaking or open-ended "what if" mode. (A few curated, sourced failure cases are in the backlog, §13.)
 - No SRAM, passives, or fuses, and nothing above M2.
 
 ## 10. FinFET epilogue
@@ -166,7 +174,7 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 
 - **M0 (done).** Repo, smoke test (Python → `.glb` → R3F viewer), GitHub Pages deploy.
 - **M1: STI vertical slice.** Done means all of the following:
-  - every `wafer` + `sti` step is in `steps.yaml` with all three text tiers, sourced params, and confidence flags
+  - every `wafer` + `sti` step is in `steps.yaml` with all three text tiers (public voice for summary and explanation), sourced params, confidence flags, and `story` flags; both modules are in `spec/modules.yaml`
   - pipeline geometry plus delta meshes for every geometry step
   - doping hook in place (an empty field is fine at this point)
   - tool panels for `furnace`, `rtp`, `litho` (full tour), `etch`, `wet`, `cvd`, and `cmp`
@@ -178,7 +186,10 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 - **M4.** `silicide` + `rmg`.
 - **M5.** `contact` + `beol`.
 - **M6.** `finfet` epilogue.
-- **M7: launch review.** Second-source audit of every parameter, accessibility pass, and consider contacting Plummer & Griffin for permission or feedback.
+- **M7: intro and finale.**
+  - *Powers-of-ten intro:* a skippable zoom of about 15 s from a phone to its chip, the die, rows of standard cells, and the one inverter. Scale facts it shows are sourced.
+  - *Switching finale:* the finished inverter is interactive. Flipping the input shows which transistor conducts (its channel glows) and the output node following, labeled illustrative.
+- **M8: launch review.** Second-source audit of every parameter, accessibility pass, and consider contacting Plummer & Griffin for permission or feedback.
 
 ## 12. Verify before writing the affected steps
 
@@ -196,3 +207,11 @@ Each item gets a source in `spec/sources.md`, or stays in the data with confiden
 - An Intel-specific source for cell height and device widths (currently Nangate2010 scaled, `uncertain`). The nitride thickness is still `uncertain` for 32 nm.
 - Real-scale well, punch-through, and Vt implant species, energies, and doses.
 - Current GAA production facts for the epilogue.
+
+## 13. Backlog (after the first user test)
+
+Held until the STI slice has been tried by 3–5 people with no technical background (see STATUS.md). Their reactions decide what gets built.
+
+- **What goes wrong:** 3–5 hand-built, sourced failure cases shown beside the correct result (for example no pad oxide, over-polished STI, a misaligned mask).
+- **Days in the fab:** a running indicator of time and step count, once sourced.
+- **Share images:** a preview image per step for links pasted into messages and social media.

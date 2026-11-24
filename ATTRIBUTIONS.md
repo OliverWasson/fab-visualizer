@@ -40,6 +40,10 @@ These run in the offline pipeline and are not distributed with the site.
 Development tools (black, ESLint, TypeScript, Vite) are not distributed and are
 not listed.
 
+## Photos
+
+Real tool photos (SCOPE.md §8.2) are added one at a time. Each needs an entry here before it ships: subject, author or owner, license (CC variant or written permission, with date), and source URL. None yet.
+
 ## References
 
 Sources cited for process facts and parameters are listed in `spec/sources.md`.

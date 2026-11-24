@@ -1,0 +1,20 @@
+# Module goals and intros, in process order. Public voice: STYLE.md §12.
+# Checked by `python -m pipeline.check`.
+
+- id: wafer
+  title: The starting wafer
+  goal: Start from the purest, most perfect crystal people know how to make.
+  intro: >-
+    Every chip begins as a slice of one enormous silicon crystal. Before
+    anything is built, it helps to know what that slice is, and why fabs choose
+    this particular kind.
+
+- id: sti
+  title: Shallow trench isolation
+  goal: Carve glass-filled moats so a billion tightly packed transistors can't leak current into each other.
+  intro: >-
+    A chip packs transistors so close together that, left alone, current would
+    leak between neighbors. So before building any transistor, the fab carves a
+    shallow trench around each one and fills it with glass. It takes about a
+    dozen steps, and most of the layers you'll see along the way are temporary
+    scaffolding, built only to be removed.
