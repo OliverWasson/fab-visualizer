@@ -124,6 +124,7 @@ SOURCE_TYPES = (
     "roadmap",
     "vendor",
     "patent",
+    "pdk",
     "news",
 )
 SOURCE_FIELDS = ("Citation", "Type", "Group")
@@ -178,12 +179,12 @@ def _check_text(r: _Report, where: str, field: str, text: Any) -> None:
 
 def _resolve_sources(
     r: _Report, where: str, source: Any, sources: dict[str, dict[str, str]] | None
-) -> list[str]:
+) -> list[frozenset[str]]:
     """Check one source key or a list of them; return the groups that resolved."""
     keys = source if isinstance(source, list) else [source]
     if not keys:
         r.err(where, "source list is empty")
-    groups: list[str] = []
+    groups: list[frozenset[str]] = []
     for key in keys:
         m = SOURCE_RE.match(key) if isinstance(key, str) else None
         if not m:
@@ -196,8 +197,14 @@ def _resolve_sources(
                 f"source base key {m.group(1)!r} has no '### {m.group(1)}' in sources.md",
             )
         else:
-            groups.append(sources[m.group(1)].get("Group", m.group(1)))
+            raw = sources[m.group(1)].get("Group", m.group(1))
+            groups.append(frozenset(g.strip() for g in raw.split(",") if g.strip()))
     return groups
+
+
+def _independent(groups: list[frozenset[str]]) -> bool:
+    """True if at least two of the sources share no group at all."""
+    return any(not (a & b) for i, a in enumerate(groups) for b in groups[i + 1 :])
 
 
 def _check_camera(r: _Report, where: str, cam: Any) -> None:
@@ -296,10 +303,8 @@ def _check_step(
             r.err(pw, f"confidence {p['confidence']!r} not in {CONFIDENCE}")
         if p.get("source"):
             groups = _resolve_sources(r, pw, p["source"], sources)
-            if p.get("confidence") == "verified" and len(set(groups)) < 2:
-                r.err(
-                    pw, "verified needs 2+ sources from different groups in sources.md"
-                )
+            if p.get("confidence") == "verified" and not _independent(groups):
+                r.err(pw, "verified needs 2+ sources that share no group in sources.md")
         names.add(str(p.get("name")))
     for need in KIND_PARAMS.get(kind, ()):
         if need not in names:
