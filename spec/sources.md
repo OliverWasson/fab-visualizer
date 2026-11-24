@@ -4,7 +4,7 @@ Every source cited in `spec/steps.yaml`. Format and rules: `CONVENTIONS.md` (Sou
 
 - One entry per `### <BASEKEY>` heading. Keys are `<FirstAuthorSurname or Org><Year>`, plus a letter if needed (`Smith2009a`), with no hyphens.
 - Required lines: **Citation**, **Type**, **Group**. Optional: **Link**, **Access**, **Notes**.
-- **Type** is one of `paper`, `teardown`, `textbook`, `review`, `roadmap`, `vendor`, `patent`, `news`.
+- **Type** is one of `paper`, `teardown`, `textbook`, `review`, `roadmap`, `vendor`, `patent`, `pdk`, `news`. A `pdk` is a generic open design kit: usable for representative layout dimensions, never for what a specific company did.
 - **Group** marks independence. Sources from the same authors, the same company, or derived from one another share a group. A source can list several groups, comma-separated (for example a paper with authors from two organizations). A param marked `verified` needs at least two sources that share no group.
 - For an edited handbook, cite each chapter as its own entry, since chapters have different authors. Keys use the chapter's first author.
 - Not acceptable as sources: Wikipedia, forums, blogs without primary references, or AI output. Use them only to find primary sources.
@@ -117,3 +117,47 @@ Every source cited in `spec/steps.yaml`. Format and rules: `CONVENTIONS.md` (Sou
   - Trends (pp. 449, 455–456): in-situ hard-mask-open single-etcher STI etch (resist on) in production by 2000 and more feasible as profiles steepen; slopes up to 88° for scaled trenches (Lam SEM shows 87°, Fig. 9-11); a 50 nm top-corner radius removes the I–V double hump for slopes ≤80° (p. 451); trench depth expected to fall below 0.2 µm near the 0.1 µm node (p. 456).
   - HDP-CVD (p. 460): sputter rate peaks about 45° from normal, producing 45° facets at trench tops and bottom-up fill.
   - p. 469 example stack (196 nm nitride, 15 nm liner) is an MIT test wafer, so it is not independent of Pan1998.
+
+### James2010
+- **Citation:** D. James, "Silicon Chip Teardown to the Atomic Scale – Challenges Facing the Reverse Engineering of Semiconductors," *Microscopy and Microanalysis* 16 (Suppl. 2), pp. 1898–1899, 2010. DOI: 10.1017/S1431927610057284.
+- **Type:** teardown
+- **Group:** chipworks
+- **Link:** https://doi.org/10.1017/S1431927610057284
+- **Notes:** Two-page conference abstract, free on Cambridge Core. p. 1898: lithography moved 248 → 193 → 193i; strain techniques include stress liners, embedded SiGe, and STI. p. 1899: TEM of the Intel 32 nm PMOS gate stack, labeled SiO interfacial oxide, Hf-based high-k, TiN work-function metal, Ta-based layer, then TiN and Al–Ti layers, with SiGe S/D and nitride sidewall spacer. Figure read 2026-11-24. Middle panel (20 nm scale), top down: AlTiO 7.1 nm, AlTi 8.2 nm, TiN 4.0 nm, TiAl 4.8 nm, TiN, Ta-based liner, PMOS WF metal, high-k, gate oxide; metal layers are U-shaped, lining the gate cavity. Zoom (2 nm scale), from Si up: SiO, Hf-based high-k, TiN WF (2.0 nm), Ta-based, TiN; the 1.3 nm and 2.3 nm arrows both cross the SiO/high-k region and are ambiguous (best reading: 2.3 nm total dielectric, 1.3 nm high-k; a 1.3 nm SiO alone would exceed Natarajan2008's 9 Å EOT). Left panel (50 nm scale): diamond-faceted (Σ) SiGe S/D extending under the spacers toward the channel. Gate height ≈35–40 nm by rough scale-bar measurement (not a stated value), consistent with reading Natarajan2008's 35 nm gate thickness as gate height. The 3.7 nm label in the text extraction does not appear in the Intel 32 nm figure; it is probably from another panel on the page.
+
+### Chipworks2011
+- **Citation:** Chipworks, "TSMC HKMG is Out There!," Real Chips blog, Semiconductor Digest, July 12, 2011.
+- **Type:** teardown
+- **Group:** chipworks
+- **Link:** https://www.semiconductor-digest.com/tsmc-hkmg-is-out-there-2/
+- **Notes:** TSMC 28 nm HPL (Xilinx Kintex-7). 11 metal layers; M1–M4 pitch ≈96 nm; contacted gate pitch ≈118 nm; minimum Lg ≈33 nm. Plan view shows restricted design rules: regular unidirectional functional and dummy gate lines, plus dummy active regions; gate patterned by double patterning with a cut mask. Buffer oxide, high-k, and a common work-function metal deposited before the dummy poly (high-k first); no eSiGe in HPL; extra sidewall spacer; wafers rotated for a ⟨100⟩ channel direction. Intel is said to stress NMOS with the gate metal stack and contacts.
+
+### Tilke2006
+- **Citation:** A. T. Tilke, R. Hampp, C. Stapelmann, M. Culmsee, R. Conti, W. Wille, R. Jaiswal, M. Galiano, and A. Jain, "STI Gap-Fill Technology with High Aspect Ratio Process for 45nm CMOS and beyond," Proc. IEEE/SEMI Advanced Semiconductor Manufacturing Conf. (ASMC), 2006, pp. 71–76.
+- **Type:** paper
+- **Group:** ibmalliance, amat
+- **Access:** IEEE Xplore (Dartmouth Libraries); personal copy in `references/`, never committed.
+- **Notes:** Infineon and IBM (IBM/Infineon/Samsung/Chartered alliance) with Applied Materials co-authors. HDP was preferred for STI, but below 65 nm at aspect ratios >8:1 it needs dep/etch cycles that attack liners; HARP (O₃/TEOS SACVD at 540 °C) fills >10:1, up to ≈12:1, void-free (pp. 71, 73). Flow comparison, Fig. 2: pad stack, litho/RIE, liner, fill, anneal (HARP), CMP, STI post-anneal (p. 72). Table 2 predicted trench width between liners 70/55/40 nm and depth + pad stack 400–500 nm at 65/45/32 nm (p. 73); SEM trench depths ≈285–342 nm (Figs. 6, 7). Liner options: oxide + ≈4 nm nitride, or re-oxidized oxynitride; pure oxide liners hurt narrow devices via boron out-diffusion (p. 74). HDP fill compressive, HARP tensile; narrow p-FET ≈10% better with HARP (pp. 74–75).
+
+### Tilke2007
+- **Citation:** A. T. Tilke et al., "Shallow Trench Isolation for the 45-nm CMOS Node and Geometry Dependence of STI Stress on CMOS Device Performance," *IEEE Trans. Semicond. Manuf.* 20(2), pp. 59–67, May 2007. DOI: 10.1109/TSM.2007.896632.
+- **Type:** paper
+- **Group:** ibmalliance, amat
+- **Access:** IEEE Xplore (Dartmouth Libraries); personal copy in `references/`, never committed.
+- **Notes:** Journal version of Tilke2006, same team, so the same groups. HDP oxide needs no densification anneal after deposition, but a post-CMP STI anneal (RTA or furnace) is still required; HARP needs a densification anneal after deposition (e.g., 1050 °C, 30 min, dry N₂) instead (p. 60, Fig. 2). Nitride liner (≈10 nm in experiments) prevents active-width loss during steam anneals (≈12 nm loss without it) (p. 60). Test trenches had 87–88° sidewalls; steeper or retrograde profiles cause seams in the fill, and below 45 nm even 87–88° may not be enough (p. 61).
+
+### NCSU2011
+- **Citation:** NC State University EDA group, *FreePDK45* process design kit, version 1.4, April 2011, with design rules on the FreePDK45 wiki.
+- **Type:** pdk
+- **Group:** ncsu
+- **Link:** https://eda.ncsu.edu/freepdk/freepdk45/
+- **Access:** Free online; Apache License 2.0.
+- **Notes:** Generic, non-manufacturable 45 nm kit compiled from published papers, predictive models, and rule scaling; 2.5 nm manufacturing grid. Poly: width 50 nm (drawn; gate assumed 45 nm), gate spacing over active 140 nm (deliberately the most conservative of three papers), extension past active 55 nm, active beyond gate 70 nm. Active: width 90 nm, spacing 80 nm, well enclosure 55 nm. Contact: 65 × 65 nm, spacing 75 nm, 35 nm to gate, 5 nm active/poly enclosure. M1 65/65 nm; M2–M3 70/70 nm; via1 65 nm. Wells: width 200 nm, spacing 225 nm. Metal stack table gives M1 130 nm pitch, 130 nm thick. Use for proportions only, scaled to Intel 32 nm pitches.
+
+### Nangate2010
+- **Citation:** Nangate Open Cell Library, version PDKv1.3_v2010_12 (Si2 OpenEDA), as distributed in the OpenROAD-flow-scripts `flow/platforms/nangate45` platform.
+- **Type:** pdk
+- **Group:** ncsu, nangate
+- **Link:** https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/tree/master/flow/platforms/nangate45
+- **Access:** Free; Apache License 2.0 (LICENSE in the platform directory). Personal copies in `references/nangate45/`, never committed.
+- **Notes:** Generic, purposely non-manufacturable library built on FreePDK45 (so it shares the `ncsu` group). Tech LEF: metal1 pitch 140 nm (horizontal tracks), metal2 pitch 190 nm. INV_X1 read from the GDS (layers: 1 active, 2 pwell, 3 nwell, 4 nimplant, 5 pimplant, 9 poly, 10 contact, 11 metal1, 235 outline): cell 380 × 1400 nm (10 tracks); poly gate 50 nm wide from y 40 to 1360, with a pad for the gate contact; NMOS active W 415 nm (y 90–505), PMOS active W 630 nm (y 680–1310), both x 40–300; 175 nm STI between them, 90 nm to each cell edge; 9 contacts of 65 × 65 nm, 35 nm from the gate, two per S/D, gate contact over the STI gap; well boundary at y 590; M1 rails 170 nm wide centered on the cell edges, vertical output strap joining the drains. No dummy poly.
