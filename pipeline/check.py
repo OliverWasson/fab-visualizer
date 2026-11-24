@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from pipeline import gen_materials_ts, materials, spec_check
+from pipeline import gen_materials_ts, mask_check, materials, spec_check
 
 
 def main() -> int:
@@ -42,6 +42,10 @@ def main() -> int:
     e, w = spec_check.check_steps()
     errors += [f"steps: {x}" for x in e]
     warnings += [f"steps: {x}" for x in w]
+
+    e, w = mask_check.check_masks()
+    errors += [f"masks: {x}" for x in e]
+    warnings += [f"masks: {x}" for x in w]
 
     for w in warnings:
         print(f"warning  {w}")

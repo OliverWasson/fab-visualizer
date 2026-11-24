@@ -67,5 +67,28 @@ Newest entries go at the bottom. Each entry has a date, the decision, and why. D
 - **G2 revised:** NMOS gets a raised S/D epi step; its strain (stacking faults, RMG) is a text note. The tensile CESL step is removed. *Supersedes* G2 in the Scope entry.
 - **G4 reopened:** silicide timing follows Intel 32 nm once sourced; `uncertain` until then.
 
+## 2026-11-23: STI module choices
+- **Starting wafer is bare p-type (100), ~10¹⁵ cm⁻³.** Advanced CMOS usually starts on a p-epi wafer (Xiao2012 p. 551); that becomes a `fab_reality` note. Why: the epi layer is Si on Si and would look identical; no Intel-specific source yet.
+- **STI resist is stripped after the nitride/pad-oxide etch, before the Si trench etch,** which uses the nitride as a hard mask (Xiao2012 Fig. 13.7). PG2023's order (etch all three, then strip) goes in `details` as an alternative. Marked `uncertain` until a third source settles it.
+- **A fill densification anneal follows STI CMP,** as a `thermal` step flagged `uncertain`. Why: Xiao's STI flows include it (Figs. 13.7, 10.28; p. 407), but Xiao p. 556 says HDP oxide needs none.
+- **A source can belong to several groups.** Independence means sharing no group. Edited handbooks are cited per chapter. Why: Pan1998 shares a company with one Doering & Nishi chapter and an author with another, and a single group per source couldn't express that.
+
+## 2026-11-24: STI module, after sourcing
+This *supersedes* "STI module choices" (2026-11-23) where they differ.
+- **Resist stays on through the nitride, pad-oxide, and Si etch, then is stripped** (PG2023, Quirk2001; Wolf2002 reports in-situ hard-mask-open etching as the scaling trend). Xiao2012's hard-mask order goes in `details`.
+- **A post-CMP STI anneal replaces the fill-densification anneal.** HDP needs no densification (Xia2007, Xiao2012 p. 556) but a post-CMP anneal is still used (Tilke2007, Xiao2012 Fig. 13.7). Temperature and time unsourced.
+- **Liner oxidation runs in the `rtp` tool** (Timans2007, Wolf2002), ≈15 nm (Xiao2012, Quirk2001). Wolf's 0.25 µm-era 40–50 nm would not fit 32 nm trenches.
+- **An HF pad-oxide undercut step is added before the liner,** for top-corner rounding (Wolf2002).
+- **Values:** pad oxide ≈15 nm (verified), nitride ≈100 nm (`uncertain`; 100–200 nm at 0.25 µm per Wolf2002 and Pan1998), trench sidewall ≈87° (verified, Wolf2002 + Tilke2007), STI depth ≈200 nm (Natarajan2008), HDP fill with 45° facets (Pan1998, Wolf2002).
+- **G3's Σ recess shape is verified** (James2010 TEM, Packan2009).
+- **New source type `pdk`** for generic open design kits (FreePDK45, Nangate). They supply representative layout proportions where Intel publishes nothing, scaled to Intel 32 nm pitches, and can never verify a company-specific fact.
+
+## 2026-11-24: Cell layout
+- **The cell is Nangate2010's INV_X1 scaled to Intel 32 nm pitches:** x by the CPP ratio (112.5/190), y by the M1-track ratio (112.5/140), with Lg 30 nm from Natarajan2008. Why: FreePDK45's poly direction is deliberately conservative (NCSU2011), so a single scale factor would distort the cell; both vertical ratios agree (≈0.80–0.82). Cell 225 × 1125 nm; W_n ≈ 334 nm, W_p ≈ 506 nm.
+- **Dummy poly at both cell edges, over STI,** at ±1 CPP (Chipworks2011, TSMC 28 nm), so the model is 3 CPP wide. Nangate has none.
+- **Square contacts, two per S/D, scaled from Nangate.** Intel's contact scheme is unsourced.
+- **One deviation from Nangate:** the input M1 pad is widened left so the input via shares the M2 track.
+- **Masks are checked automatically** (`pipeline/mask_check.py`): cell = 2 CPP × tracks × M1 pitch; gate and dummies lg wide at 0 and ±CPP; contacts inside their active or poly and on the right M1 net; gate contact over STI; vias inside matching M1 and M2; no M1 or M2 shorts; wells split in the STI gap; params sourced.
+
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

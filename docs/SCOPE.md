@@ -50,7 +50,7 @@ The model is **anchored to Intel's 32 nm flow**: gate-last HKMG with high-k last
 - V1 and M2 bring the In and Out pins up one level, so a dual-damascene module appears exactly once.
 
 **Extent:**
-- The plan footprint is set by cell height and contacted poly pitch (roughly 0.8–1 µm × 0.4 µm; real values to be sourced).
+- The cell is 225 × 1125 nm (2 CPP × 10 M1 tracks) and the model is 3 CPP wide (337.5 nm), so both dummy gates sit fully inside. Shapes live in `masks/inverter.yaml`, checked by `pipeline/mask_check.py`.
 - Vertical geometry is true scale (correction G1).
 - The substrate is truncated below the well junction plus a margin. The bottom face gets a break marker and a note that the wafer continues to about 775 µm thick.
 
@@ -64,9 +64,9 @@ This is an outline only. Parameters, sources, and exact step lists belong in `sp
 
 | Module | Main steps |
 |---|---|
-| `wafer` | Starting substrate: p-type (100), ~10¹⁵ cm⁻³ |
-| `sti` | Pad oxide · LPCVD nitride · **full litho tour** · nitride/oxide/Si etch · resist strip · liner oxidation · gap fill (HDP/SACVD class) · CMP · HF deglaze · nitride strip |
-| `well` | Screen oxide · N-well mask: deep well, punch-through, and Vt implants (P) · strip · P-well mask: same set (B) · strip · short anneal |
+| `wafer` | Starting substrate: bare p-type (100), ~10¹⁵ cm⁻³ (epi wafers as a `fab_reality` note) |
+| `sti` | Pad oxide (≈15 nm) · LPCVD nitride (≈100 nm, uncertain) · **full litho tour** · nitride/pad-oxide/Si etch with resist on (≈87° sidewalls) · resist strip · HF pad-oxide undercut · liner oxidation (RTP, ≈15 nm, rounds the top corner) · HDP gap fill · CMP stopping on nitride · post-CMP STI anneal · HF deglaze · nitride strip |
+| `well` | Pad oxide strip · sacrificial (screen) oxide (≈20 nm) · N-well mask: deep well, punch-through, and Vt implants (P) · strip · P-well mask: same set (B) · strip · short anneal |
 | `gate` | Screen oxide strip · dummy gate oxide · poly · nitride hard mask · gate mask (poly-cut mask?, §12) · gate etch · strip · reoxidation |
 | `ldd` | Offset spacer deposition and etch · PMOS halo + extension implants · NMOS halo + extension implants · anneal (method to verify) |
 | `spacer` | Main spacer deposition · anisotropic spacer etch |
@@ -94,9 +94,9 @@ Each becomes a `fab_reality` note on the affected steps, citing its own source.
 
 | # | Textbook | Modeled instead | Confidence |
 |---|---|---|---|
-| G1 | Vertically compressed simulation domain: STI ~40 nm, 3–10 keV well implants | Real-scale depths: STI ≈ 200 nm (Intel 32 nm isolation thickness), retrograde wells below the STI | High that the textbook is compressed; STI single-source |
+| G1 | Vertically compressed simulation domain: STI ~40 nm, 3–10 keV well implants | Real-scale depths: STI ≈ 200 nm (Intel 32 nm isolation thickness), retrograde wells below the STI | High that the textbook is compressed; STI depth single-source (IBM-alliance flows were deeper, ≈300 nm, Tilke2006) |
 | G2 | NMOS strain from SiC:P epi | Raised NMOS S/D epi; strain from stacking faults and the RMG flow as text notes (not geometry). No stress liner unless a source shows one | Raised S/D verified; strain mechanism single-source |
-| G3 | PMOS deep S/D implant, then recess + SiGe | Σ recess + in-situ B-doped SiGe right after the main spacer, before the NMOS deep S/D; no PMOS deep implant | Medium-high on order; medium on Σ shape, verify |
+| G3 | PMOS deep S/D implant, then recess + SiGe | Σ recess + in-situ B-doped SiGe right after the main spacer, before the NMOS deep S/D; no PMOS deep implant | Medium-high on order; Σ shape verified (James2010 TEM, Packan2009) |
 | G4 | TiSi₂ at 350–450 °C with a TiN strip | NiPt-class silicide; poly protected by the gate nitride hard mask. Timing (before ILD0 vs. in contact trenches) follows Intel 32 nm once sourced | Uncertain, verify |
 | G5 | One 10 nm spacer; extensions implanted against the bare gate | Thin offset spacer before halo/extension implants, then the main spacer | High |
 | G6 | Well drive-in at 1000 °C for 10 min; separate well and Vt masks | One mask per well carrying deep-well, punch-through, and Vt implants, then a short anneal | High |
@@ -105,7 +105,8 @@ Each becomes a `fab_reality` note on the affected steps, citing its own source.
 
 - Intel 45 nm was high-k first, metal gate last; Intel moved to high-k last at 32 nm. TSMC 28 nm stayed high-k first.
 - Embedded Si:C for NMOS reached production only at IBM 22 nm (2012), so the textbook's SiC:P NMOS step doesn't fit this generation.
-- STI gap fill was HDP-CVD, SACVD (O₃-TEOS), or flowable CVD, not LPCVD SiH₄ + O₂. This changes the tool class but not the modeled shape.
+- STI gap fill was HDP-CVD, SACVD (O₃-TEOS), or flowable CVD, not LPCVD SiH₄ + O₂. This changes the tool class but not the modeled shape. We model HDP; at 45 nm and below, high-aspect-ratio trenches moved to O₃/TEOS HARP fill (Tilke2006/2007).
+- 45 nm-class STI liners were often oxide plus a thin nitride, or oxynitride, rather than pure oxide (Tilke2006).
 - Si–O is the stronger bond, not Si–N (the textbook, p. 38, says the reverse).
 - "Si₂Cl₂" on p. 38 is a typo for SiH₂Cl₂.
 - Intel 22 nm was tri-gate (three-sided), not double-gate. This goes in the epilogue.
@@ -168,7 +169,7 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
   - every `wafer` + `sti` step is in `steps.yaml` with all three text tiers, sourced params, and confidence flags
   - pipeline geometry plus delta meshes for every geometry step
   - doping hook in place (an empty field is fine at this point)
-  - tool panels for `furnace`, `litho` (full tour), `etch`, `wet`, `cvd`, and `cmp`
+  - tool panels for `furnace`, `rtp`, `litho` (full tour), `etch`, `wet`, `cvd`, and `cmp`
   - transitions, camera presets, and section cuts working
   - the palette tuning pass, logged in `DECISIONS.md`
   - fonts self-hosted
@@ -183,15 +184,15 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 
 Each item gets a source in `spec/sources.md`, or stays in the data with confidence `uncertain`.
 
-- Dummy poly at cell edges as a 28 nm design rule.
-- Poly-cut mask at 28 nm gate patterning.
+- Dummy poly and a poly-cut mask at Intel 32 nm (both confirmed for TSMC 28 nm by Chipworks2011).
+- Intel 32 nm channel orientation (⟨110⟩ vs. rotated ⟨100⟩). It decides whether trench sidewalls are (110) and grow a thicker liner; until sourced, the liner is modeled uniform.
 - M1 single vs. dual damascene at 28 nm.
 - Intel 32 nm NMOS raised S/D: material, doping, and where it sits in the order (G2).
-- Σ-recess profile at 28 nm (G3).
 - Intel 32 nm silicide and contact scheme: timing and number of anneals (G4).
 - A second, independent source for Intel 32 nm high-k last (currently Chipworks only).
 - Independent measurements of Intel 32 nm CPP, Lg, and STI depth (currently Intel only).
 - Anneal method after the halo/extension implants.
-- Real dimensions: Lg, CPP, cell height, STI depth, gate height, every film thickness.
+- Intel 32 nm contact scheme (square contacts vs. trench contacts); the masks use scaled square contacts until sourced.
+- An Intel-specific source for cell height and device widths (currently Nangate2010 scaled, `uncertain`). The nitride thickness is still `uncertain` for 32 nm.
 - Real-scale well, punch-through, and Vt implant species, energies, and doses.
 - Current GAA production facts for the epilogue.

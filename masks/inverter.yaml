@@ -1,0 +1,49 @@
+# Mask layout of the inverter cell (Intel 32 nm anchored). Units: nm. Origin: gate centre (x) and cell centre (y).
+# Derived from Nangate2010 INV_X1 scaled by x = CPP ratio and y = M1-track ratio; see DECISIONS.md (cell layout).
+# Generated once by a derivation script; edit by hand and re-run `python -m pipeline.check`.
+version: 1
+units: nm
+cell: {width: 225, height: 1125}
+model_extent: {x: [-168.75, 168.75], y: [-650, 650]}
+scale: {x: 0.592105, y: 0.803571}
+params:
+  - {name: cpp, value: 112.5, source: Natarajan2008-tab1, confidence: single-source}
+  - {name: lg, value: 30, source: Natarajan2008-p1, confidence: single-source}
+  - {name: m1_pitch, value: 112.5, source: Natarajan2008-tab1, confidence: single-source}
+  - {name: tracks, value: 10, source: Nangate2010-techlef, confidence: single-source, derivation: "cell height in M1 tracks"}
+  - {name: cell_height, value: 1125, source: Nangate2010-techlef, confidence: uncertain, derivation: "tracks x Intel M1 pitch"}
+  - {name: contact_size, value: 38.5, source: NCSU2011-contact1, confidence: uncertain, derivation: "65 nm x scale.x, kept square"}
+  - {name: w_n, value: 333.5, source: Nangate2010-invx1, confidence: uncertain, derivation: "415 nm x scale.y"}
+  - {name: w_p, value: 506.3, source: Nangate2010-invx1, confidence: uncertain, derivation: "630 nm x scale.y"}
+  - {name: well_boundary_y, value: -88.4, source: Nangate2010-invx1, confidence: uncertain, derivation: "y 590 of 1400, scaled"}
+layers:
+  nwell: [[-168.75, -88.4, 168.75, 650]]
+  pwell: [[-168.75, -650, 168.75, -88.4]]
+  active:
+    nmos: [[-77, -490.2, 77, -156.7]]
+    pmos: [[-77, -16.1, 77, 490.2]]
+  poly:
+    gate: [[-15, -530.4, 15, 530.4], [-44.4, -116.5, -15, -56.2]]
+    dummy_left: [[-127.5, -530.4, -97.5, 530.4]]
+    dummy_right: [[97.5, -530.4, 127.5, 530.4]]
+  contact:
+    - {net: src_n, rect: [-75.5, -406.9, -37, -368.4]}
+    - {net: src_n, rect: [-75.5, -294.4, -37, -255.9]}
+    - {net: drn_n, rect: [37, -406.9, 75.5, -368.4]}
+    - {net: drn_n, rect: [37, -294.4, 75.5, -255.9]}
+    - {net: src_p, rect: [-75.5, 255.9, -37, 294.4]}
+    - {net: src_p, rect: [-75.5, 368.4, -37, 406.9]}
+    - {net: drn_p, rect: [37, 255.9, 75.5, 294.4]}
+    - {net: drn_p, rect: [37, 368.4, 75.5, 406.9]}
+    - {net: gate, rect: [-41.5, -105.7, -2.9, -67.2]}
+  metal1:
+    vss: [[-168.75, -630.8, 168.75, -494.2], [-78.5, -562.5, -34, -227.8]]
+    vdd: [[-168.75, 494.2, 168.75, 630.8], [-78.5, 227.8, -34, 562.5]]
+    out: [[35.5, -442, 91.8, 442]]
+    in: [[-78.5, -140.6, -3, 20]]
+  via1:
+    in: [[-75.5, -59.2, -37, -20.8]]
+    out: [[37, -19.2, 75.5, 19.2]]
+  metal2:
+    in: [[-84.375, -562.5, -28.125, 562.5]]
+    out: [[28.125, -562.5, 84.375, 562.5]]
