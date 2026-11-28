@@ -136,7 +136,7 @@
   cut: gate_y
   callouts:
     - anchor: pad_oxide
-      text: Pad oxide, 15 nm
+      text: Pad oxide, 15 nm
     - anchor: original_surface
       text: Original silicon surface
   summary: >-
@@ -195,6 +195,24 @@
       unit: null
       source: PG2023-ch2-p39
       confidence: single-source
+  # Go deeper. No rate constants on purpose: Table 6-1 (PG2023 p. 252) has them, but
+  # the model is weakest below about 20 nm in dry O2 (pp. 251, 254), so a computed
+  # growth time for this 15 nm film would mislead. The step sets the thickness directly.
+  physics:
+    - name: Deal–Grove oxidation model
+      equation: '\frac{x_{\mathrm{ox}}^{2}}{B} + \frac{x_{\mathrm{ox}}}{B/A} = t + \tau'
+      explanation: >-
+        Oxidant diffuses through the existing oxide and reacts with silicon at
+        the buried interface, so growth slows as the thickness x<sub>ox</sub>
+        increases with time t. B, the parabolic rate constant, is set by oxidant
+        diffusion through the oxide; B/A, the linear rate constant, by the
+        interface reaction; τ accounts for oxide present at t = 0. Thin films
+        grow linearly, x<sub>ox</sub> ≈ (B/A)(t + τ); thick ones parabolically,
+        x<sub>ox</sub><sup>2</sup> ≈ B(t + τ). Both are Arrhenius in temperature.
+        In dry O<sub>2</sub> the first ≈20 nm grows faster than predicted, so
+        this 15 nm film lies entirely in that regime.
+      source: [PG2023-ch6-p250, PG2023-ch6-p251, PG2023-ch6-p254, PG2023-ch2-p39,
+               Xiao2012-ch5-p139]
 
 - id: sti-02-nitride
   module: sti
@@ -209,7 +227,7 @@
   cut: gate_y
   callouts:
     - anchor: nitride
-      text: Silicon nitride, 100 nm
+      text: Silicon nitride, 100 nm
     - anchor: pad_oxide
       text: Pad oxide cushion
   summary: >-
@@ -285,3 +303,623 @@
       "Si<sub>2</sub>Cl<sub>2</sub>"; it should read
       SiH<sub>2</sub>Cl<sub>2</sub>.
     source: [PG2023-ch2-p38, Xiao2012-ch5-p165]
+
+# STI lithography walkthrough: the one full tour (SCOPE.md §8.3). Later masks get two
+# steps, resist patterned and resist strip.
+# Model: one photoresist layer (resist + BARC) over the nitride, z +108.2 to +208.2
+# (100 nm, uncertain). Its anchors also serve the callouts of the three overlay steps
+# that follow (soft bake, exposure, post-exposure bake), which reuse this model.
+# Transition: no animator spreads a liquid outward; deposit_directional's rising
+# plane is the closer look for a liquid film on a flat wafer.
+- id: sti-03-resist-coat
+  module: sti
+  title: Resist coat
+  kind: geometry
+  tool: litho
+  mask: null
+  transition:
+    type: deposit_directional
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: photoresist
+      text: Photoresist, a light-sensitive film
+  summary: >-
+    The wafer spins thousands of times a minute, flinging a honey-thick liquid into
+    an even film.
+  explanation: >-
+    The trenches need a pattern, so the wafer gets photoresist, a light-sensitive
+    coating that will carry it. A few drops land at the center, and spinning
+    spreads them over the whole 300 mm disk as the solvent evaporates. The faster
+    the spin, the thinner the film. A thin layer spun on first keeps light from
+    bouncing back off the wafer. Like the layers before it, this film is
+    scaffolding: it will be gone right after the trenches are cut.
+  details: >-
+    The coat-and-develop track and the scanner work as one linked line. Xiao's
+    sequence for an advanced track is clean, bake and prime, spin coat, soft
+    bake, align and expose, post-exposure bake, develop, hard bake, and
+    inspection [Xiao2012-ch6-p185, Xiao2012-ch6-p186-fig6.7]. Preparation is a
+    1–2 min hot-plate bake at 150–200 °C to drive off adsorbed moisture, with
+    HMDS vapor primed in the same chamber to help the resist adhere; the wafer
+    then cools on a chill plate before coating
+    [Xiao2012-ch6-p187, Xiao2012-ch6-p188]. Plummer & Griffin describe a similar
+    dehydration bake and HMDS priming, usually from vapor
+    [PG2023-ch5-p185, PG2023-ch5-p186]. An
+    organic bottom anti-reflective coating (BARC) is spun on before the resist
+    to cut reflections from the layers below [Xiao2012-ch6-p201,
+    Xiao2012-ch6-p202, PG2023-ch5-p222]; the model draws BARC and resist as one
+    layer.
+
+    Resist is dispensed onto the center of the wafer turning at about 500 rpm,
+    then spun at up to 7000 rpm; the thickness falls as the inverse square root
+    of the spin rate [Xiao2012-ch6-p189]. Plummer & Griffin give 3000–6000 rpm
+    for about 30 s: the film levels in the first few seconds, and the solvent
+    keeps evaporating for the rest [PG2023-ch5-p186]. The liquid is about as
+    thick as honey [PG2023-ch2-p38].
+
+    No source gives the resist or BARC thickness for this layer at 32 nm.
+    Plummer & Griffin's typical single-layer range is 0.1–0.5 µm, thinner for
+    high-resolution imaging [PG2023-ch5-p186], and the imaging layer of
+    multilayer stacks is often under 100 nm [PG2023-ch5-p222]; Xiao's 0.3–3 µm
+    is a generic range, not specific to 193 nm resists [Xiao2012-ch6-p189]. The
+    model uses 100 nm for resist and BARC together, flagged uncertain. A thinner
+    film resolves finer features but holds up to the etch for less time
+    [Xiao2012-ch6-p184].
+
+    The track is joined to the scanner because many resists must be exposed
+    soon after their bake [Xiao2012-ch6-p199, Xiao2012-ch6-p211]. The film is
+    scaffolding: it masks the etch and is stripped right after
+    [PG2023-ch2-p39].
+  params:
+    - name: method
+      value: spin coating
+      unit: null
+      source: [Xiao2012-ch6-p189, PG2023-ch5-p186]
+      confidence: verified
+    - name: thickness
+      value: 100
+      unit: nm
+      source: PG2023-ch5-p186
+      confidence: uncertain
+    - name: spin_speed
+      value: "3000–6000"
+      unit: rpm
+      source: PG2023-ch5-p186
+      confidence: single-source
+    - name: primer
+      value: HMDS vapor
+      unit: null
+      source: [Xiao2012-ch6-p188, PG2023-ch5-p186]
+      confidence: verified
+    - name: prebake_temperature
+      value: "150–200"
+      unit: °C
+      source: Xiao2012-ch6-p187
+      confidence: single-source
+    - name: prebake_time
+      value: "1–2"
+      unit: min
+      source: Xiao2012-ch6-p187
+      confidence: single-source
+    - name: antireflective_layer
+      value: organic BARC under the resist
+      unit: null
+      source: [Xiao2012-ch6-p201, PG2023-ch5-p222]
+      confidence: verified
+
+# Overlay step (kind thermal): reuses the resist-coat model. The 10–20% shrinkage is
+# not modeled; the coat's 100 nm stands for the baked film.
+- id: sti-04-soft-bake
+  module: sti
+  title: Soft bake
+  kind: thermal
+  tool: litho
+  mask: null
+  transition:
+    type: thermal
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: photoresist
+      text: Film firms as solvent leaves
+  summary: >-
+    Near 100 °C the film turns from liquid to solid, so the image printed next
+    will not blur.
+  explanation: >-
+    A hot plate drives most of the solvent out, and the film shrinks by up to a
+    fifth. A soft film could tremble during exposure and smear the image, like a
+    photo taken with an unsteady hand. Then a chill plate brings the wafer back
+    to room temperature. That matters: one degree of warmth stretches a 300 mm
+    wafer by about 750 nm, while later patterns must line up within a few
+    nanometers.
+  details: >-
+    The bake drives out most of the solvent and turns the resist from liquid to
+    solid; it also improves adhesion, and the film shrinks by about 10–20% while
+    keeping 5–20% solvent [Xiao2012-ch6-p193]. Plummer & Griffin call it the
+    pre-bake and give 90–100 °C, with solvent falling from about 25% to 5% and
+    stresses from spinning relaxing [PG2023-ch5-p186]. An underbaked film is
+    soft enough to shake during exposure and blur the image [Xiao2012-ch6-p193].
+    The model treats its 100 nm film as the baked thickness and does not show
+    the shrinkage.
+
+    Each resist has its own optimized bake [Xiao2012-ch6-p193]. Plummer &
+    Griffin's typical flow lists 10–30 min [PG2023-ch5-p185], but advanced fabs
+    bake on hot plates in the track [Xiao2012-ch6-p193], and Xiao gives about
+    1 min for the hot-plate post-exposure bake [Xiao2012-ch6-p202], so that time
+    is flagged uncertain. Neither source gives the gas around the hot plate. For
+    a chemically amplified resist the bake must leave some solvent behind,
+    because the acid needs it to diffuse during the post-exposure bake
+    [Xiao2012-ch6-p193].
+
+    After the bake, the wafer cools on a chill plate and must hold its
+    temperature through alignment and exposure: at an expansion of
+    2.5×10<sup>−6</sup> per °C, a 1 °C change alters a 300 mm wafer's diameter
+    by 0.75 µm [Xiao2012-ch6-p180, Xiao2012-ch6-p194].
+
+    Comparisons: overlay tolerance is 10–20% of the critical dimension
+    [Xiao2012-ch6-p180]. For Intel's 30 nm gate [Natarajan2008-p1] that is
+    3–6 nm, against about 750 nm of stretch per degree.
+  params:
+    - name: temperature
+      value: "90–100"
+      unit: °C
+      source: PG2023-ch5-p186
+      confidence: single-source
+    - name: time
+      value: "10–30"
+      unit: min
+      source: PG2023-ch5-p185
+      confidence: uncertain
+    - name: ambient
+      value: not stated (hot plate in the track)
+      unit: null
+      source: Xiao2012-ch6-p193
+      confidence: uncertain
+    - name: method
+      value: hot plate, then chill plate
+      unit: null
+      source: Xiao2012-ch6-p193
+      confidence: single-source
+    - name: shrinkage
+      value: "10–20"
+      unit: "%"
+      source: Xiao2012-ch6-p193
+      confidence: single-source
+
+# Overlay step (kind exposure): reuses the resist-coat model. The litho_expose animator
+# plays UV through the active-area pattern; the latent image is not drawn.
+- id: sti-05-expose
+  module: sti
+  title: Exposure
+  kind: exposure
+  tool: litho
+  mask: active
+  story: true
+  transition:
+    type: litho_expose
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: photoresist
+      text: Hidden image in the film
+  summary: >-
+    A projector run backwards shrinks the first pattern onto the wafer, shining
+    ultraviolet light through a film of water.
+  explanation: >-
+    Ultraviolet light shines through a patterned glass plate, and lenses shrink
+    the image to a quarter of its size. A thin film of water between the last
+    lens and the wafer sharpens it, a trick borrowed from microscopes. Where the
+    light lands, the film changes chemically, though nothing shows yet. This
+    first pattern marks where every transistor will go, and some of its gaps are
+    narrower than the light's own wavelength of 193 nm.
+  details: >-
+    This is the active-area mask: its pattern keeps resist over the two
+    transistor regions and lets it clear wherever a trench will be cut. The
+    first patterning step of a process is aligned to the wafer's notch
+    [Xiao2012-ch6-p197]; each later mask is aligned to the patterns already on
+    the wafer [PG2023-ch5-p150].
+
+    The light is 193 nm, from an argon fluoride (ArF) excimer laser
+    [Xiao2012-ch6-p199, Xiao2012-ch6-tab6.1], still the light used for
+    virtually all chips [PG2023-ch5-p150]. Intel used 193 nm immersion for its
+    critical layers at 32 nm [Natarajan2008-p1]; the model assumes this layer is
+    one of them. Xiao compares projection printing to an overhead projector,
+    which enlarges about ten times [Xiao2012-ch6-p195]; the scanner runs the
+    other way. Its reticle, a chromium-patterned glass plate, carries the
+    pattern at four times its printed size [Xiao2012-ch6-p197,
+    PG2023-ch5-p159]. A scanner exposes one field at a time through a slit,
+    moving reticle and wafer in sync, then steps to the next field
+    [Xiao2012-ch6-p196, Xiao2012-ch6-p197]; today's 193 nm tools print a
+    26 × 33 mm field with 1–2 nm overlay at about 275 wafers an hour
+    [PG2023-ch5-p163].
+
+    In immersion, purified water fills a gap of about 1 mm between the last lens
+    and the wafer and is held there while the stage moves [PG2023-ch5-p220].
+    Water passes more than 90% of 193 nm light [PG2023-ch5-p219], and its
+    refractive index of 1.44 [Xiao2012-ch6-p221, PG2023-ch5-p220] lets the lens
+    capture light at steeper angles, so today's tools reach a numerical aperture
+    of about 1.35 [PG2023-ch5-p219, PG2023-ch5-p220]. Xiao writes the resolution
+    as R = k<sub>1</sub>λ/(n·NA), a gain of about one technology node, and the
+    depth of focus improves by at least 1.46× [Xiao2012-ch6-p221]. The idea
+    comes from microscopes: Carl Zeiss used it in the nineteenth century, and it
+    reached chip manufacturing around 2005 [PG2023-ch5-p218].
+
+    Where light lands, this chemically amplified resist releases acid; the image
+    stays latent until the post-exposure bake and development
+    [Xiao2012-ch6-p184, Xiao2012-ch6-p202, PG2023-ch5-p186]. Typical doses for such resists exceed
+    20–40 mJ/cm<sup>2</sup> [PG2023-ch5-p187]. Xiao (2012) gives $30–40 million
+    for an advanced 193 nm immersion scanner, usually the most expensive tool in
+    a fab [Xiao2012-ch6-p197]; Plummer & Griffin (2023) put state-of-the-art
+    193 nm tools above $50 million [PG2023-ch5-p151].
+
+    Comparisons: some gaps here are narrower than the 193 nm wavelength. The gap
+    between this cell's two transistors is about 141 nm in the scaled layout
+    [Nangate2010-invx1], and Intel's isolation pattern repeats every 140 nm
+    [Natarajan2008-tab1], so its tightest gaps are narrower still.
+  params:
+    - name: wavelength
+      value: 193
+      unit: nm
+      source: [Natarajan2008-p1, Xiao2012-ch6-p199]
+      confidence: verified
+    - name: dose
+      value: "> 20–40"
+      unit: mJ/cm<sup>2</sup>
+      source: PG2023-ch5-p187
+      confidence: single-source
+    - name: exposure
+      value: immersion (water)
+      unit: null
+      source: [Natarajan2008-p1, Xiao2012-ch6-p221]
+      confidence: verified
+    - name: water_refractive_index
+      value: 1.44
+      unit: null
+      source: [Xiao2012-ch6-p221, PG2023-ch5-p220]
+      confidence: verified
+    - name: reduction
+      value: "4:1"
+      unit: null
+      source: [Xiao2012-ch6-p197, PG2023-ch5-p159]
+      confidence: verified
+    - name: isolation_pitch
+      value: 140
+      unit: nm
+      source: Natarajan2008-tab1
+      confidence: single-source
+
+# Overlay step (kind thermal): reuses the resist-coat model.
+- id: sti-06-post-exposure-bake
+  module: sti
+  title: Post-exposure bake
+  kind: thermal
+  tool: litho
+  mask: null
+  transition:
+    type: thermal
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: photoresist
+      text: Image appears in the film
+  summary: >-
+    Heat finishes what the light started: each acid molecule the light made sets
+    off reaction after reaction.
+  explanation: >-
+    Light alone does not finish the job. Where it landed, it freed a little acid
+    inside the film, and this second, hotter bake lets that acid move. The acid
+    is never used up: it unlocks one spot in the film's plastic, then moves on
+    to the next. That reuse lets a small dose of light make a big chemical
+    change, and after this bake the image finally shows in the film.
+  details: >-
+    In a chemically amplified resist, the post-exposure bake completes the
+    exposure. The heat lets the photoacid diffuse and react with blocking groups
+    on the polymer, which makes a positive resist soluble in developer
+    [PG2023-ch5-p212, PG2023-ch5-p213]. The acid is not consumed, so each
+    molecule drives many reactions [PG2023-ch5-p212]. That catalysis is why such
+    resists were developed for deep-UV sources, which are much weaker than
+    mercury lamps [Xiao2012-ch6-p184]. After the bake, an image of the exposed
+    areas appears in the resist [Xiao2012-ch6-p202].
+
+    The bake runs on a hot plate at 110–130 °C for about 1 min, hotter than the
+    soft bake for the same resist, and the wafer then cools on a chill plate
+    [Xiao2012-ch6-p202]. Reaction and diffusion rates depend exponentially on
+    temperature, so time and especially temperature are tightly controlled
+    [PG2023-ch5-p187]. The bake also smooths the standing waves that reflections
+    left in the exposure [Xiao2012-ch6-p202, PG2023-ch5-p211]; underbaking
+    leaves them, and overbaking hardens the resist and spoils development
+    [Xiao2012-ch6-p202]. Neither source gives the gas around the hot plate.
+  params:
+    - name: temperature
+      value: "110–130"
+      unit: °C
+      source: Xiao2012-ch6-p202
+      confidence: single-source
+    - name: time
+      value: 1
+      unit: min
+      source: Xiao2012-ch6-p202
+      confidence: single-source
+    - name: ambient
+      value: not stated (hot plate in the track)
+      unit: null
+      source: Xiao2012-ch6-p202
+      confidence: uncertain
+    - name: method
+      value: hot plate, then chill plate
+      unit: null
+      source: Xiao2012-ch6-p202
+      confidence: single-source
+
+# Model: photoresist kept over the two active rectangles of masks/inverter.yaml;
+# photoresist__removed is the film developed away over the future trenches.
+- id: sti-07-develop
+  module: sti
+  title: Development
+  kind: geometry
+  tool: litho
+  mask: active
+  transition:
+    type: litho_develop
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: photoresist
+      text: Photoresist, now patterned
+    - anchor: resist_opening
+      text: Opening where a trench goes
+  summary: >-
+    A weak alkaline solution washes away the light-struck film, and the first
+    pattern stands in relief.
+  explanation: >-
+    Sprayed onto the spinning wafer, the solution dissolves the film wherever
+    the light struck, then water rinses it away and the spin dries the wafer.
+    The film now stands only over the two future transistors, open where
+    trenches will be cut. Before any etching, machines measure the pattern. If
+    it is off, the fab strips the film and prints the wafer again; after the
+    etch, a mistake would mean scrapping it.
+  details: >-
+    The developer dissolves the exposed regions of this positive resist
+    [Xiao2012-ch6-p203]. Fabs use tetramethylammonium hydroxide (TMAH), a base
+    free of sodium and potassium, whose mobile ions would damage devices
+    [Xiao2012-ch6-p203]; Plummer & Griffin likewise describe positive deep-UV
+    resists dissolving in a basic developer once the polymer is unblocked
+    [PG2023-ch5-p187]. Development has three parts, develop, rinse, and dry, on
+    a spinning wafer in the track, with the developer sprayed or puddled on and
+    a deionized-water rinse [Xiao2012-ch6-p203, Xiao2012-ch6-p204,
+    PG2023-ch5-p187]. The developer is sensitive to temperature: too warm
+    overdevelops and shrinks features, too cool underdevelops
+    [Xiao2012-ch6-p204].
+
+    After development, the pattern is checked for overlay, line width (by
+    CD-SEM or scatterometry), and defects [Xiao2012-ch6-p206,
+    Xiao2012-ch6-p210]. A resist pattern is still temporary and can be stripped
+    and reworked; after an etch or implant it is permanent, and a bad wafer is
+    scrapped [Xiao2012-ch6-p206]. An advanced CMOS chip needs more than 30
+    masks, each with this check [Xiao2012-ch6-p206].
+
+    Both textbook sequences end with a hard bake that strengthens the resist for
+    the etch: 100–130 °C for 1–2 min on a hot plate [Xiao2012-ch6-p205], or
+    10–30 min at 125–150 °C in Plummer & Griffin's typical flow
+    [PG2023-ch5-p185]. It is described here rather than shown as its own step.
+  params:
+    - name: developer
+      value: TMAH
+      unit: null
+      source: Xiao2012-ch6-p203
+      confidence: single-source
+    - name: resist_tone
+      value: positive
+      unit: null
+      source: [PG2023-ch2-p39, Xiao2012-ch6-p203]
+      confidence: verified
+    - name: method
+      value: spray or puddle, on a spinning wafer
+      unit: null
+      source: [Xiao2012-ch6-p204, PG2023-ch5-p187]
+      confidence: verified
+    - name: rinse
+      value: deionized water
+      unit: null
+      source: [Xiao2012-ch6-p204, PG2023-ch5-p187]
+      confidence: verified
+
+# Model: one resist-on etch through the nitride (z +108.2 to +8.2), the pad oxide
+# (+8.2 to -6.8), and 200 nm of silicon (-6.8 to -206.8). Nitride and oxide walls
+# vertical; silicon walls 87 degrees from horizontal, so each wall moves in about
+# 10.5 nm over the 200 nm depth (200 x tan 3 degrees). Bottom corners rounded
+# (radius unsourced); top corners stay sharp until the HF undercut and liner steps.
+# Resist thinning during the etch is not modeled (no source for the amount).
+- id: sti-08-trench-etch
+  module: sti
+  title: Trench etch
+  kind: geometry
+  tool: etch
+  mask: null
+  story: true
+  transition:
+    type: etch_anisotropic
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: trench
+      text: Trench, 200 nm into silicon
+    - anchor: sidewall
+      text: Wall tilted about 3°
+    - anchor: photoresist
+      text: Photoresist, still in place
+  summary: >-
+    A plasma, the same kind of glowing gas that lights a fluorescent tube,
+    carves trenches 200 nm deep.
+  explanation: >-
+    Wherever the photoresist left an opening, the plasma eats through the
+    nitride and the thin glass, then switches gases to cut into the silicon.
+    These trenches will become the glass moats between transistors. Their walls
+    lean outward about 3° on purpose, so the glass that fills them later leaves
+    no hidden gaps. In the silicon there is no layer to stop on, so the etch
+    simply runs on a timer.
+  details: >-
+    The resist stays on while the plasma cuts all three layers, and is
+    stripped afterward [PG2023-ch2-p39, Quirk2001-ch9-p208]. Wolf reports this
+    single-chamber, resist-on sequence in production by 2000, and more feasible
+    as trench walls steepened [Wolf2002-ch9-p449]. Xiao's advanced flow
+    differs: it strips the resist after the nitride and pad-oxide etch and cuts
+    the silicon with the nitride alone as the mask, to avoid contamination from
+    the resist [Xiao2012-ch13-fig13.7, Xiao2012-ch9-p334, Xiao2012-ch9-p352].
+    In that order the silicon etch must be selective to nitride, uniformly
+    across the wafer, because nitride lost here comes out of the margin for the
+    later polish [Ventzek2007-ch21-p20].
+
+    The nitride and pad oxide are etched with fluorocarbon gases such as
+    CF<sub>4</sub>/CHF<sub>3</sub> under heavy ion bombardment, as vertically
+    as possible [Xiao2012-ch9-p342, Xiao2012-ch9-p343, Ventzek2007-ch21-p20].
+    The silicon is etched mainly with HBr, after a fluorine-based breakthrough
+    step; O<sub>2</sub> builds a thin oxide-like film on the sidewalls, which
+    sets the taper [Xiao2012-ch9-p352, Xiao2012-ch9-p353, Ventzek2007-ch21-p20].
+    Wolf lists HBr/Cl<sub>2</sub>/O<sub>2</sub> and
+    HBr/NF<sub>3</sub>/He/O<sub>2</sub> for this step [Wolf2002-ch9-p447]. In
+    Xiao's classification the nitride and oxide etches are ion-assisted by
+    surface damage, and the silicon etch by sidewall blocking
+    [Xiao2012-ch9-tab9.3]. Xiao assigns silicon to inductively coupled plasma
+    (ICP) chambers and dielectrics to capacitively coupled (CCP) ones in
+    300 mm fabs [Xiao2012-ch9-p363]; the single-chamber sequence opens the
+    nitride in situ, in the silicon etcher [Wolf2002-ch9-p449]. The plasma is
+    similar to the one in a fluorescent tube [PG2023-ch2-p39].
+
+    Depth: Intel lists its 32 nm isolation as 200 nm thick [Natarajan2008-tab1].
+    The model reads that as the depth etched into the silicon, measured from
+    the silicon surface left by the pad oxidation. The finished oxide stands
+    slightly above the silicon [Pan1998-p1, Shinn2007-ch17-p43], so the true
+    etch depth may be a little less. IBM-alliance trenches of the 45 nm era
+    were deeper, about 285–340 nm in published cross-sections
+    [Tilke2006-fig6, Tilke2006-fig7].
+
+    Profile: no source gives Intel's wall angle. Published scaled trenches
+    stand at 87–88° from the surface [Wolf2002-ch9-p455, Tilke2007-p61], and
+    the model uses 87°, which is 3° from vertical. A slight slope avoids seams
+    in the fill, while steeper or overhanging walls cause them
+    [Ventzek2007-ch21-p20, Tilke2007-p61]. Plummer & Griffin's simulation
+    figure uses 85° [PG2023-ch2-p38-fig2.4]. The bottom corners are rounded
+    [Wolf2002-ch9-p447, Quirk2001-ch9-p208]; the top corners stay sharp for now.
+    Sharp corners concentrate the electric field and raise leakage
+    [PG2023-ch2-p39, Ventzek2007-ch21-p20], so the next steps round them
+    [Wolf2002-ch9-p450, PG2023-ch2-p40].
+
+    Endpoint: the nitride and oxide etches can be ended when the plasma's
+    emission changes, watching lines from CN, N, or O
+    [Xiao2012-ch9-p342, Xiao2012-ch9-p343, Xiao2012-ch9-p349]; an overetch
+    follows the endpoint [Xiao2012-ch9-p322]. The silicon has no layer beneath
+    to signal the end, so its etch is timed
+    [Xiao2012-ch9-p352, Xiao2012-ch9-p353].
+  params:
+    - name: sequence
+      value: "nitride, pad oxide, then silicon, resist on throughout"
+      unit: null
+      source: [PG2023-ch2-p39, Quirk2001-ch9-p208]
+      confidence: verified
+    - name: nitride_oxide_chemistry
+      value: CF<sub>4</sub>/CHF<sub>3</sub>
+      unit: null
+      source: [Xiao2012-ch9-p342, Ventzek2007-ch21-p20]
+      confidence: verified
+    - name: silicon_chemistry
+      value: HBr/O<sub>2</sub>
+      unit: null
+      source: [Xiao2012-ch9-p352, Wolf2002-ch9-p447]
+      confidence: verified
+    - name: depth
+      value: 200
+      unit: nm
+      source: Natarajan2008-tab1
+      confidence: single-source
+    - name: sidewall_angle
+      value: 87
+      unit: °
+      source: [Wolf2002-ch9-p455, Tilke2007-p61]
+      confidence: verified
+    - name: bottom_corners
+      value: rounded
+      unit: null
+      source: [Wolf2002-ch9-p447, Quirk2001-ch9-p208]
+      confidence: verified
+    - name: silicon_endpoint
+      value: timed
+      unit: null
+      source: [Xiao2012-ch9-p352, Xiao2012-ch9-p353]
+      confidence: single-source
+  fab_reality:
+    note: >-
+      Plummer & Griffin's flow chapter etches the silicon trench with fluorine
+      chemistry, with carbon deposited from CF<sub>4</sub> shaping the taper
+      (p. 39), and their etching chapter offers fluorine etching as one way to
+      taper an STI trench (p. 436). Manufacturing references use HBr as the main
+      silicon etchant instead, with O<sub>2</sub> forming an oxide-like film on
+      the sidewalls that sets the taper; fluorine-based gases etch the nitride
+      and oxide, run a breakthrough step, or tune the profile. The etching
+      chapter itself notes that Cl<sub>2</sub>/HBr mixtures are often used for
+      anisotropic silicon etching (p. 436).
+    source: [PG2023-ch2-p39, PG2023-ch9-p436, Xiao2012-ch9-p342,
+             Xiao2012-ch9-p352, Xiao2012-ch9-p353, Wolf2002-ch9-p447,
+             Ventzek2007-ch21-p20]
+
+# Model: photoresist removed (photoresist__removed); nothing else changes. The
+# clean that follows is mentioned in the text, not modeled.
+- id: sti-09-resist-strip
+  module: sti
+  title: Resist strip
+  kind: geometry
+  tool: wet
+  mask: null
+  transition:
+    type: strip
+  camera: overview
+  cut: gate_y
+  callouts:
+    - anchor: nitride
+      text: Nitride stencil, uncovered
+    - anchor: trench
+      text: Open trench, bare silicon
+  summary: >-
+    The first scaffolding comes down: an acid bath removes the light-sensitive
+    film and leaves the trenches open.
+  explanation: >-
+    A mix of sulfuric acid and hydrogen peroxide eats away the photoresist
+    without attacking the nitride, the glass, or the silicon. The film's only
+    job, shielding the future transistors during the etch, is done, and it
+    could not survive the heat of the steps ahead. A cleaning bath follows,
+    leaving the trenches open down to bare silicon. An advanced chip repeats
+    this cycle of print, use, and strip more than 30 times.
+  details: >-
+    Resist is removed either wet, in a mixture of sulfuric acid and hydrogen
+    peroxide (SPM), or dry, in an oxygen plasma; neither attacks the nitride,
+    oxide, or silicon beneath it [PG2023-ch2-p39]. The model shows the wet
+    route. Strips are purely chemical etches, with no ion bombardment
+    [Xiao2012-ch9-tab9.3]. No source read so far gives the mixture ratio or
+    temperature for this strip.
+
+    Stripping after the full etch follows Plummer & Griffin and Quirk & Serda
+    [PG2023-ch2-p39, Quirk2001-ch9-p208]; Pan et al.'s typical sequence also
+    has a resist strip and clean right after the trench etch [Pan1998-p1].
+    Resist cannot withstand high temperatures: later in the flow, a nitride
+    hard mask replaces it for the 750–850 °C epitaxy [PG2023-ch2-p51]. So it
+    has to go before the trench liner is grown.
+
+    After the strip, the wafers are cleaned before the liner is grown
+    [PG2023-ch2-p39]; Xiao likewise follows the silicon etch with a wet clean
+    [Xiao2012-ch9-p352, Xiao2012-ch9-p353]. The clean is described here rather
+    than shown as its own step.
+
+    Every later mask repeats this cycle: the resist is patterned, blocks an
+    etch or an implant, and is stripped [PG2023-ch2-p41, PG2023-ch2-p49]. An
+    advanced CMOS chip needs more than 30 masks [Xiao2012-ch6-p206].
+  params:
+    - name: chemistry
+      value: H<sub>2</sub>SO<sub>4</sub> + H<sub>2</sub>O<sub>2</sub>
+      unit: null
+      source: PG2023-ch2-p39
+      confidence: single-source
+    - name: dry_alternative
+      value: O<sub>2</sub> plasma
+      unit: null
+      source: PG2023-ch2-p39
+      confidence: single-source

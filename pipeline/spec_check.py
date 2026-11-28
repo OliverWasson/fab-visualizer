@@ -34,7 +34,7 @@ MODULES = (
     "beol",
     "finfet",
 )
-KINDS = ("geometry", "implant", "thermal", "clean")
+KINDS = ("geometry", "implant", "thermal", "clean", "exposure")
 TOOLS = (
     "furnace",
     "rtp",
@@ -94,6 +94,13 @@ OPTIONAL = (
 KIND_PARAMS = {
     "implant": ("species", "energy", "dose", "tilt", "twist"),
     "thermal": ("temperature", "time", "ambient"),
+    "exposure": ("wavelength", "dose"),
+}
+# Kinds that own a transition: their steps must use it, and geometry steps may not.
+KIND_TRANSITION = {
+    "implant": "implant",
+    "thermal": "thermal",
+    "exposure": "litho_expose",
 }
 
 ID_RE = re.compile(r"^([a-z]+)-(\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -259,14 +266,14 @@ def _check_step(
         if isinstance(s.get("transition"), dict)
         else None
     )
-    if t is None and kind in ("geometry", "implant", "thermal"):
+    if t is None and (kind == "geometry" or kind in KIND_TRANSITION):
         r.err(where, "transition.type is required for this kind")
     elif t is not None:
         if t not in TRANSITIONS:
             r.err(where, f"transition.type {t!r} not in STYLE.md §7")
-        elif kind in ("implant", "thermal") and t != kind:
-            r.err(where, f"{kind} steps must use transition {kind!r}")
-        elif kind == "geometry" and t in ("implant", "thermal"):
+        elif kind in KIND_TRANSITION and t != KIND_TRANSITION[kind]:
+            r.err(where, f"{kind} steps must use transition {KIND_TRANSITION[kind]!r}")
+        elif kind == "geometry" and t in KIND_TRANSITION.values():
             r.err(where, f"geometry steps can't use transition {t!r}")
         if t == "intro" and ids_so_far:
             r.err(where, "transition 'intro' is only for the first step")

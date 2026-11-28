@@ -15,6 +15,6 @@
   intro: >-
     A chip packs transistors so close together that, left alone, current would
     leak between neighbors. So before building any transistor, the fab carves a
-    shallow trench around each one and fills it with glass. It takes about a
+    shallow trench around each one and fills it with glass. It takes more than a
     dozen steps, and most of the layers you'll see along the way are temporary
     scaffolding, built only to be removed.

@@ -5,7 +5,7 @@ Handoff for the next chat. Read this first, then `SCOPE.md`, `DECISIONS.md`, `CO
 ## Where things stand
 
 - **Live site:** https://oliverwasson.github.io/fab-visualizer/ (M0 smoke test). Repo: github.com/OliverWasson/fab-visualizer.
-- **Milestone:** M1, the STI vertical slice (SCOPE.md §11). **Sourcing and cell layout are done.** `spec/steps.yaml` has the first three steps (wafer, pad oxide, nitride) in the new public voice; `spec/modules.yaml` has the `wafer` and `sti` intros.
+- **Milestone:** M1, the STI vertical slice (SCOPE.md §11). **Sourcing and cell layout are done.** `spec/steps.yaml` has the wafer step and STI steps 01–09, through the resist strip, in the public voice (01–02 are the reference; 03–09 await review); `spec/modules.yaml` has the `wafer` and `sti` intros.
 - **Approach:** engagement first (DECISIONS.md "Engagement first"). Summary and explanation are for a curious non-specialist, following STYLE.md §12; rigor lives in `details`. Story mode shows ~20–25 `story: true` steps.
 - **Branch:** recent work is on `feat/intel32-anchor`. Merge it to `main` once CI is green (`git checkout main && git merge --ff-only feat/intel32-anchor && git push`).
 
@@ -17,11 +17,12 @@ Handoff for the next chat. Read this first, then `SCOPE.md`, `DECISIONS.md`, `CO
 - `spec/sources.md`: 19 sources with groups (independence), including the `pdk` type.
 - STI module fully sourced and decided (DECISIONS.md "STI module, after sourcing").
 - Cell layout: `masks/inverter.yaml` (Nangate INV_X1 scaled to Intel pitches), checked by `pipeline/mask_check.py`.
+- STI steps 03–09: the litho walkthrough as five steps (new kind `exposure`, DECISIONS.md 2026-11-24), trench etch, resist strip; Deal–Grove `physics` on the pad oxide (PG2023 pp. 250–254).
 
 ### Next, in order
 0. **Scope is locked until M1 ships.** After the STI slice works, test it with 3–5 people with no technical background (where they get bored, confused, or say "wait, really?"), then decide the backlog (SCOPE.md §13).
 1. Merge `feat/intel32-anchor` to `main`.
-2. Write the remaining `sti` steps in `spec/steps.yaml`, matching the voice and format of the first three (the reference). Mark `story: true` on the pivotal or most visual ones (about 4–5 for STI: the trench etch, fill, and CMP are good candidates). The checker validates as you go.
+2. Write the remaining `sti` steps (HF undercut through nitride strip) in `spec/steps.yaml`, matching the reference voice and format. Story steps so far: nitride, exposure, trench etch; fill and CMP would make five, the top of the 4–5 target. The checker validates as you go.
 3. Pipeline geometry for each geometry step, with `__added` / `__removed` delta meshes (CONVENTIONS.md).
 4. Tool panels: `furnace`, `rtp`, `litho` (full tour), `etch`, `wet`, `cvd`, `cmp`.
 5. Transitions, camera presets, section cuts; palette tuning pass; self-host fonts (verify the `@fontsource` packages).
@@ -40,11 +41,13 @@ Source keys resolve to `spec/sources.md`. "verified" = 2+ sources sharing no gro
 | Pad oxide | ≈15 nm, dry O₂ (thin oxides ≈1000 °C with HCl) | Xiao2012-ch5-p132, Quirk2001-ch9-p208; conditions Xiao2012-ch5-p140 | thickness verified |
 | LPCVD nitride | ≈100 nm | Wolf2002-ch9-p447, Pan1998-p1 (both 0.25 µm era) | uncertain |
 | | SiH₂Cl₂ + NH₃, 700–800 °C, furnace | Xiao2012-ch5-p165, Quirk2001-ch11-p275, PG2023-ch2-p38 | verified |
-| STI litho | 193 nm immersion; coat, soft bake, expose, PEB, develop, hard bake | Natarajan2008-p1, Xiao2012-ch6-p221; conditions Xiao2012-ch6-p187 to p205 | 193i verified |
+| STI litho | 193 nm immersion; coat, soft bake, expose, PEB, develop (hard bake described, not a step) | Natarajan2008-p1, Xiao2012-ch6-p221; conditions Xiao2012-ch6-p187 to p205, PG2023-ch5-p185 to p187 | 193i verified |
+| | resist + BARC 100 nm; soft-bake time and bake ambients | PG2023-ch5-p186 (generic range) | uncertain |
 | STI etch | resist on through nitride, pad oxide, Si; then strip | PG2023-ch2-p39, Quirk2001-ch9-p208 (Xiao2012-ch13-fig13.7 differs; note in `details`) | verified |
 | | nitride/oxide: CF₄/CHF₃; Si: HBr/O₂ | Xiao2012-ch9-p342, Ventzek2007-ch21-p20; Xiao2012-ch9-p352, Wolf2002-ch9-p447 | verified |
 | | depth ≈200 nm | Natarajan2008-tab1 (IBM alliance ≈300 nm, Tilke2006) | single-source |
-| | sidewall ≈87°, rounded bottom corners | Wolf2002-ch9-p455, Tilke2007-p61 | verified |
+| | sidewall ≈87° | Wolf2002-ch9-p455, Tilke2007-p61 | verified |
+| | rounded bottom corners | Wolf2002-ch9-p447, Quirk2001-ch9-p208 | verified |
 | Resist strip | O₂ plasma or H₂SO₄/H₂O₂ | PG2023-ch2-p39 | single-source |
 | Pad-oxide undercut | short HF dip, improves top-corner rounding | Wolf2002-ch9-p450 | single-source |
 | Liner oxidation | ≈15 nm, RTP tool, rounds the top corner | Xiao2012-ch5-tab5.2, Quirk2001-ch9-p209; RTP Timans2007-ch11-p2, Wolf2002-ch9-p451 | verified |
@@ -75,4 +78,4 @@ Cell 225 × 1125 nm (2 CPP × 10 M1 tracks); model 337.5 nm wide (3 CPP). Origin
 
 ## Open items
 
-SCOPE.md §12 has the full verify list. Most relevant soon: nitride thickness at 32 nm, Intel's contact scheme, Intel's channel orientation, dummy poly and poly-cut at Intel 32 nm, Intel-specific cell height and device widths, real-scale well and Vt implants (M2), and the P vs. B diffusivity conflict between Xiao2012 and PG2023 (M2).
+SCOPE.md §12 has the full verify list. Most relevant soon: resist and BARC thickness and the hot-plate bake conditions (STI litho), nitride thickness at 32 nm, Intel's contact scheme, Intel's channel orientation, dummy poly and poly-cut at Intel 32 nm, Intel-specific cell height and device widths, real-scale well and Vt implants (M2), and the P vs. B diffusivity conflict between Xiao2012 and PG2023 (M2).

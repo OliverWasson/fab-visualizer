@@ -17,7 +17,7 @@ Rules that every file and every chat follows. If something here changes, log it 
 - Step IDs: `<module>-<NN>-<short-name>`. Lowercase, hyphenated, numbered with two digits per module.
   - Examples: `sti-02-nitride`, `well-03-boron-implant`
 - Modules, in process order: `wafer`, `sti`, `well`, `gate`, `ldd`, `spacer`, `sige`, `sd`, `silicide`, `rmg`, `contact`, `beol`, `finfet`
-- Each step has a `kind`: `geometry`, `implant`, `thermal`, or `clean`.
+- Each step has a `kind`: `geometry`, `implant`, `thermal`, `exposure`, or `clean`.
 
 ## Geometry files
 - One `.glb` per **geometry state**: what the wafer looks like after a `geometry` step. Non-geometry steps emit no `.glb` and reuse the latest one.
@@ -75,7 +75,7 @@ One color per material, used identically in every step and in both themes. Defin
 - id: sti-02-nitride
   module: sti
   title: Nitride deposition
-  kind: geometry            # geometry | implant | thermal | clean
+  kind: geometry            # geometry | implant | thermal | exposure | clean
   tool: furnace             # tool-id
   mask: null                # mask id on litho steps
   transition:
@@ -108,7 +108,8 @@ One color per material, used identically in every step and in both themes. Defin
 - `model` and `doping_state` default to the latest available. Set them explicitly only to override.
 - The first step uses transition `intro` (a reveal with no material change).
 - `spec/modules.yaml` lists each module once, in process order: `id`, `title`, `goal` (≤ 20 words), and `intro` (≤ 80 words), written in the public voice (STYLE.md §12).
-- Implant steps include `species`, `energy`, `dose`, `tilt`, and `twist` params. Thermal steps include `temperature`, `time`, and `ambient`.
+- Implant steps include `species`, `energy`, `dose`, `tilt`, and `twist` params. Thermal steps include `temperature`, `time`, and `ambient`. Exposure steps include `wavelength` and `dose`.
+- Implant, thermal, and exposure steps must use their own transition (`implant`, `thermal`, `litho_expose`); geometry steps can't use those three.
 - `confidence`: `verified` means two or more independent sources agree, which the checker enforces as two or more sources that share no **Group** in `sources.md` (a source may list several groups); `single-source` means one; `uncertain` means flagged and not yet confirmed.
 
 ## Sources

@@ -106,5 +106,14 @@ This *supersedes* "STI module choices" (2026-11-23) where they differ.
 - **One real, licensed photo per tool class,** behind a "See the real one" tap. Why: the gap between schematic and reality (a box the size of a bus) is itself a wow moment. Each photo needs a license recorded in ATTRIBUTIONS.md.
 - **Backlog until after the first user test** (SCOPE.md §13): curated "what goes wrong" cases, a days-in-the-fab indicator, share images. Why: build M1 and test it with non-technical people before adding more.
 
+## 2026-11-24: STI lithography walkthrough and review fixes
+- **The STI litho tour is five steps:** resist coat (`geometry`), soft bake (`thermal`), exposure (story step), post-exposure bake (`thermal`), and development (`geometry`). Later masks stay at two steps. This *supersedes* a single litho step for the tour. Why: it is the one place the site teaches lithography, and each operation changes something different.
+- **New step kind `exposure`.** It emits no `.glb`, must use transition `litho_expose`, and needs `wavelength` and `dose` params; the checker enforces this, and geometry steps can no longer use `litho_expose`. Why: exposure changes the resist's chemistry, not its shape, so none of the four kinds fit.
+- **No hard-bake step.** Both sources end the sequence with one (Xiao2012 p. 205, PG2023 Fig. 5.30); the development step describes it. Why: it keeps the walkthrough to the five operations in SCOPE.md §8.3.
+- **Resist and BARC thickness go on the verify list** (SCOPE.md §12), since Xiao2012 Ch. 6 has no 193 nm value. The model uses 100 nm, the bottom of PG2023's generic 0.1–0.5 µm (p. 186), as `uncertain`. The soft-bake time and the hot-plate ambient of both bakes are `uncertain` too.
+- **HBr vs. fluorine trench etch** is a text-only correction (SCOPE.md §7.2) and the trench etch's `fab_reality` note.
+- **The textbook's ≈28–30 nm printed STI feature is not used.** Ch. 2's figures come from a compressed simulation domain (G1), so its dimensions aren't real-node values.
+- **Rounded trench bottom corners are re-cited** to Wolf2002 p. 447 and Quirk2001 p. 208 (still verified); Tilke2007 p. 61 covers only the sidewall angle.
+
 ## Open questions
 - None at the architecture level. Open facts that still need sources are listed in SCOPE.md §12.

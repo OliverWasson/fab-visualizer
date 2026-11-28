@@ -66,12 +66,12 @@ Coordinates, units, and naming follow `CONVENTIONS.md`.
 
 ## 5. Module order
 
-This is an outline only. Parameters, sources, and exact step lists belong in `spec/steps.yaml`. Lithography appears as two steps per mask (§8), except for the full tour at the STI mask.
+This is an outline only. Parameters, sources, and exact step lists belong in `spec/steps.yaml`. Lithography appears as two steps per mask (§8), except for the five-step walkthrough at the STI mask.
 
 | Module | Main steps |
 |---|---|
 | `wafer` | Starting substrate: bare p-type (100), ~10¹⁵ cm⁻³ (epi wafers as a `fab_reality` note) |
-| `sti` | Pad oxide (≈15 nm) · LPCVD nitride (≈100 nm, uncertain) · **full litho tour** · nitride/pad-oxide/Si etch with resist on (≈87° sidewalls) · resist strip · HF pad-oxide undercut · liner oxidation (RTP, ≈15 nm, rounds the top corner) · HDP gap fill · CMP stopping on nitride · post-CMP STI anneal · HF deglaze · nitride strip |
+| `sti` | Pad oxide (≈15 nm) · LPCVD nitride (≈100 nm, uncertain) · **full litho walkthrough** (resist coat, soft bake, exposure, post-exposure bake, development) · nitride/pad-oxide/Si etch with resist on (≈87° sidewalls) · resist strip · HF pad-oxide undercut · liner oxidation (RTP, ≈15 nm, rounds the top corner) · HDP gap fill · CMP stopping on nitride · post-CMP STI anneal · HF deglaze · nitride strip |
 | `well` | Pad oxide strip · sacrificial (screen) oxide (≈20 nm) · N-well mask: deep well, punch-through, and Vt implants (P) · strip · P-well mask: same set (B) · strip · short anneal |
 | `gate` | Screen oxide strip · dummy gate oxide · poly · nitride hard mask · gate mask (poly-cut mask?, §12) · gate etch · strip · reoxidation |
 | `ldd` | Offset spacer deposition and etch · PMOS halo + extension implants · NMOS halo + extension implants · anneal (method to verify) |
@@ -87,8 +87,8 @@ This is an outline only. Parameters, sources, and exact step lists belong in `sp
 ## 6. Step granularity
 
 - **Every unit operation is a step** in `steps.yaml`, so the narrative is complete.
-- Each step has a `kind`: `geometry`, `implant`, `thermal`, or `clean`.
-- **Only `geometry` steps emit a `.glb`.** Other kinds reuse the latest model. Implant and thermal steps update the doping texture; thermal steps also show a thermal-budget readout.
+- Each step has a `kind`: `geometry`, `implant`, `thermal`, `exposure`, or `clean`.
+- **Only `geometry` steps emit a `.glb`.** Other kinds reuse the latest model. Implant and thermal steps update the doping texture; thermal steps also show a thermal-budget readout. The `exposure` kind, used once in the STI walkthrough, plays the exposure over the unchanged model; the pattern appears in the model only when it is developed.
 - **A clean is its own step only if** it removes material or the narrative depends on it (HF deglaze, the strip before gate oxidation, the pre-epi HF). Other cleans are mentioned in the explanation text of a neighboring step.
 - **Metrology is never a step.** It appears in `details` where it matters, such as CMP endpoint or etch endpoint detection.
 
@@ -113,6 +113,7 @@ Each becomes a `fab_reality` note on the affected steps, citing its own source.
 - Embedded Si:C for NMOS reached production only at IBM 22 nm (2012), so the textbook's SiC:P NMOS step doesn't fit this generation.
 - STI gap fill was HDP-CVD, SACVD (O₃-TEOS), or flowable CVD, not LPCVD SiH₄ + O₂. This changes the tool class but not the modeled shape. We model HDP; at 45 nm and below, high-aspect-ratio trenches moved to O₃/TEOS HARP fill (Tilke2006/2007).
 - 45 nm-class STI liners were often oxide plus a thin nitride, or oxynitride, rather than pure oxide (Tilke2006).
+- The textbook's STI silicon etch is fluorine-based: Ch. 2 tapers the trench with carbon deposited from CF₄ (p. 39), and Ch. 9 offers fluorine etching as one way to taper an STI trench (p. 436). Manufacturing references use HBr as the main silicon etchant, with O₂ forming the sidewall film that sets the taper (Xiao2012, Wolf2002, Ventzek2007); Ch. 9 itself notes Cl₂/HBr for anisotropic silicon etching. This is the `fab_reality` note on the trench etch.
 - Si–O is the stronger bond, not Si–N (the textbook, p. 38, says the reverse).
 - "Si₂Cl₂" on p. 38 is a typo for SiH₂Cl₂.
 - Intel 22 nm was tri-gate (three-sided), not double-gate. This goes in the epilogue.
@@ -150,7 +151,7 @@ Generic schematic cutaways, not replicas of any vendor's product. Built in the P
 
 ### 8.3 Lithography
 
-- **Full walkthrough once, at the STI mask:** coat, soft bake, exposure (reticle, immersion, printing below the wavelength), post-exposure bake, develop.
+- **Full walkthrough once, at the STI mask, as five steps:** resist coat (`geometry`), soft bake (`thermal`), exposure (`exposure`, a story step: reticle, immersion, printing below the wavelength), post-exposure bake (`thermal`), and development (`geometry`). Both sources end with a hard bake; the development step describes it rather than adding a sixth step.
 - **Every later mask is two geometry steps:** "resist patterned" (`details` names the mask and its purpose) and "resist strip."
 - Resist and BARC are modeled together as one `photoresist` layer; BARC is mentioned in the tour text. The gate nitride hard mask *is* modeled, because G4 needs it.
 
@@ -206,6 +207,8 @@ Each item gets a source in `spec/sources.md`, or stays in the data with confiden
 - Intel 32 nm contact scheme (square contacts vs. trench contacts); the masks use scaled square contacts until sourced.
 - An Intel-specific source for cell height and device widths (currently Nangate2010 scaled, `uncertain`). The nitride thickness is still `uncertain` for 32 nm.
 - Real-scale well, punch-through, and Vt implant species, energies, and doses.
+- Resist and BARC thickness for 193 nm immersion at 32 nm. Xiao2012 Ch. 6 gives only a generic 0.3–3 µm (p. 189); PG2023 gives 0.1–0.5 µm for a single layer, thinner for high-resolution imaging (p. 186), and under 100 nm for the imaging layer of multilayer stacks (p. 222). The model uses 100 nm, `uncertain`.
+- Hot-plate conditions for the STI soft and post-exposure bakes. PG2023's 10–30 min soft bake (Fig. 5.30) looks like oven timing, and neither source gives the hot-plate ambient; the soft-bake time and both ambients are `uncertain`.
 - Current GAA production facts for the epilogue.
 
 ## 13. Backlog (after the first user test)
